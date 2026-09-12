@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Computer Graphics — Graphics Playground</title>
+  <meta name="description" content="My collection of Computer Graphics practicum projects. Interactive lessons on canvas, coordinates, primitives, and real-time rendering.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="container">
+        <div class="hero-content">
+          <span class="eyebrow">Computer Graphics</span>
+          <h1>Learning graphics, one pixel at a time.</h1>
+          <p>
+            This is my home for computer graphics practicum work. Each project is an
+            interactive playground that explains one idea from the course, including the
+            canvas coordinate system to triangles, colors, and real-time input.
+          </p>
+          <a class="btn btn-outline" href="#practicums">Explore my practicums</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="practicums">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">My Practicums</span>
+          <h2>Pick a practicum to explore</h2>
+          <p class="lead">
+            Each practicum focuses on one set of ideas. New ones will be added here
+            as I work through the course.
+          </p>
+        </div>
+
+        <div class="grid grid-3">
+          <article class="card">
+            <span class="badge">P1 · Done</span>
+            <h3 class="card-title"><a href="practicum1/index.html">Graphics Playground</a></h3>
+            <p>
+              Build an interactive canvas: primitives, colors, a triangle, moving
+              objects, and mouse + keyboard input. Five small challenges show each
+              idea on its own.
+            </p>
+          </article>
+
+          <article class="card">
+            <span class="badge">P2 · Done</span>
+            <h3 class="card-title"><a href="practicum2/index.html">WebGL Primitive Playground</a></h3>
+            <p>
+              Step into WebGL2: buffers, shaders, attributes, uniforms, seven
+              primitive modes, animation, and mouse + keyboard input. Six
+              challenges isolate each idea.
+            </p>
+          </article>
+
+          <article class="card card-disabled">
+            <span class="badge">P3 · Soon</span>
+            <h3 class="card-title">Coming later</h3>
+            <p>
+              More practicums will appear here as the course moves on.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">© 2026 Arda Nareswara · Computer Graphics · Practicum projects</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

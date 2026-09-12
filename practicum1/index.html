@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practicum 1 — Graphics Playground · Computer Graphics</title>
+  <meta name="description" content="Practicum 1: an interactive canvas playground covering primitives, colors, triangles, movement, and input handling.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="../index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="back-row">
+      <a class="btn btn-back btn-outline" href="../index.html">&larr; Home</a>
+    </div>
+
+    <section class="page-head">
+      <span class="eyebrow">Practicum 1</span>
+      <h1>Graphics Playground</h1>
+      <p class="lead">
+        Practicum 1 is the first step into drawing with code. Everything here runs on
+        an HTML canvas: a 2D grid where every point is a coordinate (x, y), and a shape
+        is just a few coordinates plus a color. Each section below demonstrates one
+        requirement of the practicum, and every one of them is live.
+      </p>
+      <div class="req-strip">
+        <span class="req-chip"><b>800 × 500</b> canvas</span>
+        <span class="req-chip"><b>4</b> primitives</span>
+        <span class="req-chip"><b>4+</b> colors</span>
+        <span class="req-chip">triangle from vertices</span>
+        <span class="req-chip">moving objects</span>
+        <span class="req-chip">state-based keyboard</span>
+        <span class="req-chip">mouse coordinates</span>
+      </div>
+    </section>
+
+    <!-- ============ MAIN TASK: Playground ============ -->
+    <section class="challenge" id="playground">
+      <div class="challenge-header">
+        <span class="ch-num">MAIN</span>
+        <h2>The Playground</h2>
+      </div>
+      <p class="explain">
+        Here, you are the graphics engine. Pick a shape, a color, and a stroke width,
+        then drag on the canvas. Every shape stores the same kind of data, including its type, some
+        coordinates, and a color, and is redrawn from scratch every frame.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="toolbar">
+            <div class="tool-group" aria-label="Shape tool">
+              <button class="tool-btn active" data-tool="rect">Rect</button>
+              <button class="tool-btn" data-tool="line">Line</button>
+              <button class="tool-btn" data-tool="circle">Circle</button>
+              <button class="tool-btn" data-tool="triangle">Triangle</button>
+            </div>
+            <div class="tool-group" aria-label="Color">
+              <button class="swatch active" data-color="#4DF3FF" style="background:#4DF3FF" aria-label="Cyan"></button>
+              <button class="swatch" data-color="#6BE4D2" style="background:#6BE4D2" aria-label="Mint"></button>
+              <button class="swatch" data-color="#76A8FF" style="background:#76A8FF" aria-label="Blue"></button>
+              <button class="swatch" data-color="#70B2E6" style="background:#70B2E6" aria-label="Sky"></button>
+              <button class="swatch" data-color="#D9E6F2" style="background:#D9E6F2" aria-label="White"></button>
+            </div>
+            <div class="stroke-row">
+              <label for="stroke">Stroke</label>
+              <input type="range" id="stroke" min="1" max="10" step="1" value="2">
+              <b id="strokeVal">2</b>
+            </div>
+            <div class="tool-group pull" aria-label="Actions">
+              <button class="tool-btn" id="undo">Undo</button>
+              <button class="tool-btn" id="clear">Clear</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <canvas id="drawCanvas" width="800" height="500" tabindex="0" aria-label="Drawing playground canvas"></canvas>
+          </div>
+          <p class="canvas-hint">Drag to draw the active shape. Four shapes are already placed for you.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="drawData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Each shape is an object: type, coordinates, color, stroke.</li>
+              <li>Pointer down stores the start point; release records the end.</li>
+              <li>The loop repaints every shape each frame.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>Drag to draw the active shape.</li>
+              <li>Pick color and stroke before drawing.</li>
+              <li>Undo drops the last shape; Clear empties the canvas.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ MOTION ============ -->
+    <section class="challenge" id="motion">
+      <div class="challenge-header">
+        <span class="ch-num">MOTION</span>
+        <h2>Moving objects</h2>
+      </div>
+      <p class="explain">
+        An object at rest is just data. Add input and it moves. The square follows your
+        mouse, the circle answers the keyboard, and both stay inside the canvas. Besides
+        moving, one click can edit data: clicking the square cycles its fill color.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <canvas id="motionCanvas" width="800" height="500" tabindex="0" aria-label="Moving objects canvas"></canvas>
+          </div>
+          <p class="canvas-hint">Move the mouse · hold W A S D or arrow keys · click the square.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="motionData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>The square's position copies the mouse, clamped to the edges.</li>
+              <li>The circle reads a state-based keyboard map every frame.</li>
+              <li>A click hit-test cycles the square's color.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>Move the mouse to drag the square.</li>
+              <li>Hold W A S D or arrow keys for the circle.</li>
+              <li>Click the square to cycle its color.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE A ============ -->
+    <section class="challenge" id="challenge-a">
+      <div class="challenge-header">
+        <span class="ch-num">A</span>
+        <h2>Bouncing object</h2>
+      </div>
+      <p class="explain">
+        The smallest animation: position, plus velocity, plus a boundary check. Each
+        frame the dot moves by its velocity; each time it hits a wall, the velocity
+        flips so it bounces back.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <canvas id="bounceCanvas" width="500" height="300" tabindex="0" aria-label="Bouncing ball canvas"></canvas>
+          </div>
+          <p class="canvas-hint">Click anywhere to teleport the dot.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="bounceData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>position += velocity, every frame.</li>
+              <li>Wall hit? The velocity flips.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>Click to teleport the dot.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE B ============ -->
+    <section class="challenge" id="challenge-b">
+      <div class="challenge-header">
+        <span class="ch-num">B</span>
+        <h2>Follow the mouse</h2>
+      </div>
+      <p class="explain">
+        Following the mouse is one idea in one line: the circle's position equals the
+        mouse coordinate, read every frame. The dashed guides show it tracking along
+        the x and y axes.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <canvas id="followCanvas" width="500" height="300" tabindex="0" aria-label="Follow mouse canvas"></canvas>
+          </div>
+          <p class="canvas-hint">Move the mouse inside the canvas.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="followData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>circle.x = mouse.x and circle.y = mouse.y.</li>
+              <li>Clamped so the circle never leaves the canvas.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>Move the mouse.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE C ============ -->
+    <section class="challenge" id="challenge-c">
+      <div class="challenge-header">
+        <span class="ch-num">C</span>
+        <h2>Click to change color</h2>
+      </div>
+      <p class="explain">
+        A click is an event, and an event edits data. Each click advances an index into
+        a color list; the next frame draws with the new color. Data first, drawing second.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <canvas id="colorCanvas" width="500" height="300" tabindex="0" aria-label="Click to change color canvas"></canvas>
+          </div>
+          <p class="canvas-hint">Click to cycle the square's color.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="colorData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>A color list and an index into it.</li>
+              <li>Click increments the index, wrapping around.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>Click the canvas.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE D ============ -->
+    <section class="challenge" id="challenge-d">
+      <div class="challenge-header">
+        <span class="ch-num">D</span>
+        <h2>Move with the keyboard</h2>
+      </div>
+      <p class="explain">
+        Movement keys need state, not just events. The page remembers which keys are
+        still held down, and the position is updated from that state every frame, allowing
+        two keys to work at once.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <canvas id="keyCanvas" width="500" height="300" tabindex="0" aria-label="Keyboard movement canvas"></canvas>
+          </div>
+          <p class="canvas-hint">Hold W A S D or the arrow keys.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="keyData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>keydown and keyup store which keys are held.</li>
+              <li>The update reads the held keys every frame.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>Hold W A S D or arrow keys.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE E ============ -->
+    <section class="challenge" id="challenge-e">
+      <div class="challenge-header">
+        <span class="ch-num">E</span>
+        <h2>Mouse coordinate</h2>
+      </div>
+      <p class="explain">
+        Every point on the canvas is a pair of numbers. This demo shows the raw (x, y)
+        of the cursor in real time. These are the same numbers that place every shape you draw.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <canvas id="coordCanvas" width="500" height="300" tabindex="0" aria-label="Mouse coordinate canvas"></canvas>
+          </div>
+          <p class="canvas-hint">Move the mouse to watch (x, y) update.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="coordData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>The pointer position is read every time it moves.</li>
+              <li>Both numbers are rounded and drawn each frame.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>Move the mouse.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ OPTIONAL ============ -->
+    <section class="challenge" id="optional">
+      <div class="challenge-header">
+        <span class="ch-num">+</span>
+        <h2>Extra experiments</h2>
+      </div>
+      <p class="explain">
+        Same engine, three extra ideas. Click to scatter circles, toggle a motion trail
+        so objects leave a mark, and watch different data move at different speeds.
+      </p>
+
+      <div class="optional-grid">
+        <div class="optional-card">
+          <h3 class="card-title">Click to create circles</h3>
+          <p class="canvas-hint">Every click pushes a new circle object into an array, and the loop draws them all.</p>
+          <div class="canvas-frame">
+            <canvas id="createCanvas" width="460" height="260" tabindex="0" aria-label="Click to create circle canvas"></canvas>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="createData"></div>
+          </div>
+          <p class="canvas-hint">Click anywhere to drop a circle.</p>
+        </div>
+
+        <div class="optional-card">
+          <h3 class="card-title">Trail mode</h3>
+          <p class="canvas-hint">Clearing each frame gives a clean animation; skipping the clear leaves the trail behind. Same object, both ways.</p>
+          <div class="canvas-frame">
+            <canvas id="trailCanvas" width="460" height="260" tabindex="0" aria-label="Trail mode canvas"></canvas>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="trailData"></div>
+          </div>
+          <p class="canvas-hint">Press the spacebar to toggle the trail.</p>
+        </div>
+
+        <div class="optional-card">
+          <h3 class="card-title">Multiple moving objects</h3>
+          <p class="canvas-hint">Four objects, four sets of data, with different position, color, and speed each. Swap the data, swap the motion.</p>
+          <div class="canvas-frame">
+            <canvas id="multiCanvas" width="460" height="260" tabindex="0" aria-label="Multiple moving objects canvas"></canvas>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="multiData"></div>
+          </div>
+          <p class="canvas-hint">Just watch.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">© 2026 Arda Nareswara · Computer Graphics · Practicum projects</p>
+    </div>
+  </footer>
+
+  <script src="/practicum1/main.js"></script>
+</body>
+</html>

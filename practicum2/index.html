@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practicum 2 — WebGL Primitive Playground · Computer Graphics</title>
+  <meta name="description" content="Practicum 2: WebGL2 fundamental playground covering buffers, shaders, attributes, uniforms, primitive assembly, animation, and input.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="../index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="back-row">
+      <a class="btn btn-back btn-outline" href="../index.html">&larr; Home</a>
+    </div>
+
+    <section class="page-head">
+      <span class="eyebrow">Practicum 2</span>
+      <h1>WebGL Primitive Playground</h1>
+      <p class="lead">
+        Practicum 2 moves from Canvas 2D to the GPU. Every shape below is vertex data
+        uploaded to a buffer, connected to a shader through attributes, tinted through
+        uniforms, assembled into primitives, and drawn with a draw call, all in
+        Normalized Device Coordinates. Each section is live WebGL2.
+      </p>
+      <div class="req-strip">
+        <span class="req-chip"><b>WebGL2</b> context</span>
+        <span class="req-chip"><b>7</b> primitive modes</span>
+        <span class="req-chip"><b>2</b> attributes</span>
+        <span class="req-chip"><b>6</b> uniforms</span>
+        <span class="req-chip">interleaved <b>VAO</b></span>
+        <span class="req-chip">vertex color</span>
+        <span class="req-chip">state-based keyboard</span>
+        <span class="req-chip">mouse NDC</span>
+      </div>
+    </section>
+
+    <!-- ============ MAIN TASK: Playground ============ -->
+    <section class="challenge" id="playground">
+      <div class="challenge-header">
+        <span class="ch-num">MAIN</span>
+        <h2>The Playground</h2>
+      </div>
+      <p class="explain">
+        One program, one interleaved buffer, many draw calls. Three triangles with different
+        brightness, three points with different sizes, lines, strip, loop, triangle strip and
+        fan, plus three bouncing triangles, click-to-spawn points, and wave animation.
+        Same shader, different uniforms per draw.
+      </p>
+
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="toolbar">
+            <div class="tool-group" aria-label="Draw tool">
+              <button class="tool-btn active" id="tglTri">Triangles</button>
+              <button class="tool-btn" id="tglPts">Points</button>
+              <button class="tool-btn" id="tglLines">Lines</button>
+            </div>
+            <div class="tool-group" aria-label="Color">
+              <button class="swatch active" data-mcolor="0" style="background:#4DF3FF" aria-label="Cyan"></button>
+              <button class="swatch" data-mcolor="1" style="background:#6BE4D2" aria-label="Mint"></button>
+              <button class="swatch" data-mcolor="2" style="background:#76A8FF" aria-label="Blue"></button>
+              <button class="swatch" data-mcolor="3" style="background:#70B2E6" aria-label="Sky"></button>
+              <button class="swatch" data-mcolor="4" style="background:#D9E6F2" aria-label="White"></button>
+              <button class="swatch" data-mcolor="rgb" style="background:linear-gradient(135deg,#ff3b3b 0%,#3bff5e 50%,#3b7bff 100%)" aria-label="RGB"></button>
+            </div>
+            <div class="tool-group pull" aria-label="Actions">
+              <button class="tool-btn" id="mainRandom">Random</button>
+              <button class="tool-btn" id="mainReset">Reset</button>
+              <button class="tool-btn" id="mainPause">Pause</button>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="slider-row"><label for="mainBrightness">Bright</label><input type="range" id="mainBrightness" min="0.2" max="1.8" step="0.01" value="1.0"><b id="mainBrightnessVal">1.00</b></div>
+            <div class="slider-row"><label for="mainSpeed">Speed</label><input type="range" id="mainSpeed" min="0.0" max="2.5" step="0.01" value="1.0"><b id="mainSpeedVal">1.00</b></div>
+            <div class="slider-row"><label for="mainWave">Wave</label><input type="range" id="mainWave" min="0.0" max="0.08" step="0.005" value="0.02"><b id="mainWaveVal">0.02</b></div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glMain" width="800" height="500" tabindex="0" aria-label="WebGL playground canvas"></canvas>
+              <div class="gl-hud" id="mainHud">HUD</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Pick Triangles, Points, or Lines, pick a color, then drag on the canvas to draw. Click works too for small shapes. Hold W A S D / arrows · R reset · Space pause · C random color.</p>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="mainData"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Interleaved vertex: x, y, r, g, b in one buffer + VAO.</li>
+              <li>Attributes a_position + a_color; varying v_color carries color.</li>
+              <li>Uniforms change per draw: brightness, point size, wave.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Controls</h3>
+            <ul class="ticks">
+              <li>One draw tool at a time; Triangles is default.</li>
+              <li>Swatches set draw color; RGB draws red-green-blue.</li>
+              <li>Drag to draw; click for a small shape.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE A ============ -->
+    <section class="challenge" id="challenge-a">
+      <div class="challenge-header">
+        <span class="ch-num">A</span>
+        <h2>Primitive selector</h2>
+      </div>
+      <p class="explain">
+        Same three vertices, three different assemblies. The draw mode, not the data,
+        decides whether you see a triangle, three dots, or a closed outline.
+      </p>
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="toolbar">
+            <div class="tool-group">
+              <button class="tool-btn active" data-amode="TRIANGLES">Triangle</button>
+              <button class="tool-btn" data-amode="POINTS">Points</button>
+              <button class="tool-btn" data-amode="LINE_LOOP">Lines</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glA" width="500" height="300" tabindex="0" aria-label="Primitive selector canvas"></canvas>
+              <div class="gl-hud" id="hudA">mode</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Pick a mode. Vertex data never changes.</p>
+        </div>
+        <aside class="side-panel">
+          <div class="side-block"><h3 class="side-title">Live data</h3><div class="data-lines" id="dataA"></div></div>
+          <div class="side-block"><h3 class="side-title">How it works</h3><ul class="ticks"><li>gl.drawArrays(mode, 0, 3) with mode swapped.</li><li>gl_PointSize only matters for POINTS.</li></ul></div>
+          <div class="side-block"><h3 class="side-title">Controls</h3><ul class="ticks"><li>Click Triangle / Points / Lines.</li></ul></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE B ============ -->
+    <section class="challenge" id="challenge-b">
+      <div class="challenge-header">
+        <span class="ch-num">B</span>
+        <h2>Color control</h2>
+      </div>
+      <p class="explain">
+        Vertex colors interpolate across the triangle. Buttons rewrite the color buffer.
+        The slider scales brightness through a uniform, data versus parameter.
+      </p>
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="toolbar">
+            <div class="tool-group">
+              <button class="tool-btn" data-bcolor="#4DF3FF">Cyan</button>
+              <button class="tool-btn" data-bcolor="#6BE4D2">Mint</button>
+              <button class="tool-btn" data-bcolor="#76A8FF">Blue</button>
+              <button class="tool-btn" id="bRandom">Random</button>
+            </div>
+            <div class="slider-row"><label for="bBright">Bright</label><input type="range" id="bBright" min="0.2" max="1.8" step="0.01" value="1.0"><b id="bBrightVal">1.00</b></div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glB" width="500" height="300" tabindex="0" aria-label="Color control canvas"></canvas>
+              <div class="gl-hud" id="hudB">color</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Press a color, then drag brightness. Press Random a few times. Each click reshuffles all three vertex colors.</p>
+        </div>
+        <aside class="side-panel">
+          <div class="side-block"><h3 class="side-title">Live data</h3><div class="data-lines" id="dataB"></div></div>
+          <div class="side-block"><h3 class="side-title">How it works</h3><ul class="ticks"><li>Buttons re-upload a_color buffer.</li><li>Slider sends u_globalBrightness.</li></ul></div>
+          <div class="side-block"><h3 class="side-title">Controls</h3><ul class="ticks"><li>Color buttons + brightness slider.</li><li>Random can be pressed many times for new colors.</li></ul></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE C ============ -->
+    <section class="challenge" id="challenge-c">
+      <div class="challenge-header">
+        <span class="ch-num">C</span>
+        <h2>Spawn primitive</h2>
+      </div>
+      <p class="explain">
+        Mouse pixels become NDC, NDC becomes a vertex. Every click appends one point
+        to a dynamic buffer and draws it on the next frame.
+      </p>
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="toolbar toolbar-narrow"><div class="tool-group pull"><button class="tool-btn" id="cClear">Clear</button></div></div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glC" width="500" height="300" tabindex="0" aria-label="Spawn primitive canvas"></canvas>
+              <div class="gl-hud" id="hudC">click</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Click anywhere to drop a point.</p>
+        </div>
+        <aside class="side-panel">
+          <div class="side-block"><h3 class="side-title">Live data</h3><div class="data-lines" id="dataC"></div></div>
+          <div class="side-block"><h3 class="side-title">How it works</h3><ul class="ticks"><li>pixel → NDC: (x/w)*2−1, 1−(y/h)*2.</li><li>New vertex pushed with DYNAMIC_DRAW.</li></ul></div>
+          <div class="side-block"><h3 class="side-title">Controls</h3><ul class="ticks"><li>Click to spawn; Clear empties.</li></ul></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE D ============ -->
+    <section class="challenge" id="challenge-d">
+      <div class="challenge-header">
+        <span class="ch-num">D</span>
+        <h2>Multiple moving objects</h2>
+      </div>
+      <p class="explain">
+        Three triangles, three offsets, three velocities. Each bounces off the NDC
+        walls on its own. One shader, different uniforms per draw.
+      </p>
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glD" width="500" height="300" tabindex="0" aria-label="Multiple moving objects canvas"></canvas>
+              <div class="gl-hud" id="hudD">moving</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Just watch. Each triangle has its own speed.</p>
+        </div>
+        <aside class="side-panel">
+          <div class="side-block"><h3 class="side-title">Live data</h3><div class="data-lines" id="dataD"></div></div>
+          <div class="side-block"><h3 class="side-title">How it works</h3><ul class="ticks"><li>Per-object offset += velocity each frame.</li><li>Hit ±1 wall? Velocity flips.</li></ul></div>
+          <div class="side-block"><h3 class="side-title">Controls</h3><ul class="ticks"><li>No input. Autonomous motion.</li></ul></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE E ============ -->
+    <section class="challenge" id="challenge-e">
+      <div class="challenge-header">
+        <span class="ch-num">E</span>
+        <h2>Procedural pattern</h2>
+      </div>
+      <p class="explain">
+        No hand-written vertices. A loop builds a dim dotted grid below and a
+        bright centered ring above. Vertex data as computation, not typing.
+      </p>
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glE" width="500" height="300" tabindex="0" aria-label="Procedural pattern canvas"></canvas>
+              <div class="gl-hud" id="hudE">procedural</div>
+            </div>
+          </div>
+          <p class="canvas-hint">10 × 4 grid points below + one centered ring above, all from for loops.</p>
+        </div>
+        <aside class="side-panel">
+          <div class="side-block"><h3 class="side-title">Live data</h3><div class="data-lines" id="dataE"></div></div>
+          <div class="side-block"><h3 class="side-title">How it works</h3><ul class="ticks"><li>generated.push(x, y, r, g, b) in a loop.</li><li>Drawn as POINTS + LINE_STRIP.</li></ul></div>
+          <div class="side-block"><h3 class="side-title">Controls</h3><ul class="ticks"><li>No input. Geometry is code.</li></ul></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE F ============ -->
+    <section class="challenge" id="challenge-f">
+      <div class="challenge-header">
+        <span class="ch-num">F</span>
+        <h2>Uniforms &amp; HUD</h2>
+      </div>
+      <p class="explain">
+        One triangle drawn three times with different brightness and wave. The HUD is
+        plain HTML over the canvas. No WebGL text rendering needed.
+      </p>
+      <div class="demo-row">
+        <div class="demo-main">
+          <div class="toolbar toolbar-narrow">
+            <div class="slider-row"><label for="fBright">Global</label><input type="range" id="fBright" min="0.2" max="1.8" step="0.01" value="1.0"><b id="fBrightVal">1.00</b></div>
+            <div class="tool-group pull"><button class="tool-btn" id="fPause">Pause</button></div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glF" width="500" height="300" tabindex="0" aria-label="Uniforms and HUD canvas"></canvas>
+              <div class="gl-hud" id="hudF">HUD</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Same geometry, three uniforms. Move the slider.</p>
+        </div>
+        <aside class="side-panel">
+          <div class="side-block"><h3 class="side-title">Live data</h3><div class="data-lines" id="dataF"></div></div>
+          <div class="side-block"><h3 class="side-title">How it works</h3><ul class="ticks"><li>setCommonUniforms() then draw, three times.</li><li>HUD div updated each frame.</li></ul></div>
+          <div class="side-block"><h3 class="side-title">Controls</h3><ul class="ticks"><li>Global brightness + pause.</li></ul></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">© 2026 Arda Nareswara · Computer Graphics · Practicum projects</p>
+    </div>
+  </footer>
+
+  <!-- Vertex Shader (GLSL ES 3.00) -->
+  <script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+in vec2 a_position;
+in vec3 a_color;
+uniform float u_time;
+uniform vec2 u_offset;
+uniform float u_pointSize;
+uniform float u_waveAmount;
+out vec3 v_color;
+void main() {
+  float wave = sin(u_time + a_position.x * 8.0) * u_waveAmount;
+  vec2 animatedPosition = a_position;
+  animatedPosition.y += wave;
+  animatedPosition += u_offset;
+  gl_Position = vec4(animatedPosition, 0.0, 1.0);
+  gl_PointSize = u_pointSize;
+  v_color = a_color;
+}
+  </script>
+
+  <!-- Fragment Shader (GLSL ES 3.00) -->
+  <script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision mediump float;
+in vec3 v_color;
+uniform float u_brightness;
+uniform float u_globalBrightness;
+out vec4 outColor;
+void main() {
+  vec3 finalColor = v_color * u_brightness * u_globalBrightness;
+  outColor = vec4(finalColor, 1.0);
+}
+  </script>
+
+  <script src="/practicum2/main.js"></script>
+</body>
+</html>
