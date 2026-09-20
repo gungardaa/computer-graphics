@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practicum 3 · Transformation Playground · Computer Graphics</title>
+  <meta name="description" content="Practicum 3. An interactive WebGL2 playground for translation, rotation, scaling, matrix order, pivot, parent child, and orbit.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/practicum3/styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="../index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="back-row">
+      <a class="btn btn-back btn-outline" href="../index.html">&larr; Home</a>
+    </div>
+
+    <section class="page-head">
+      <span class="eyebrow">Practicum 3</span>
+      <h1>Transformation Playground</h1>
+      <p class="lead">
+        Practicum 3 is about moving shapes without touching their points.
+        Every triangle below keeps the same local numbers.
+        One small 3 by 3 matrix does all the moving and turning and stretching on the GPU.
+      </p>
+      <div class="req-strip">
+        <span class="req-chip"><b>WebGL2</b> context</span>
+        <span class="req-chip"><b>2</b> objects</span>
+        <span class="req-chip">move plus turn plus stretch</span>
+        <span class="req-chip">matrix uniform</span>
+        <span class="req-chip">keyboard plus mouse</span>
+        <span class="req-chip">auto motion</span>
+        <span class="req-chip">order compared</span>
+        <span class="req-chip">axes plus pivot</span>
+      </div>
+    </section>
+
+    <!-- ============ MAIN STAGE ============ -->
+    <section class="stage" id="stage">
+      <div class="stage-head">
+        <span class="ch-num">MAIN</span>
+        <h2>The Stage</h2>
+      </div>
+      <p class="explain">
+        This is the main bench. The cyan triangle answers to you.
+        The orange one moves on its own.
+        Both share one triangle shape and only their matrices differ.
+      </p>
+
+      <div class="dock">
+        <div class="tool-group" aria-label="Presets">
+          <button class="tool-btn" id="preset1">Preset 1</button>
+          <button class="tool-btn" id="preset2">Preset 2</button>
+          <button class="tool-btn" id="preset3">Preset 3</button>
+        </div>
+        <div class="tool-group" aria-label="Stage actions">
+          <button class="tool-btn" id="orderBtn">Flip order</button>
+          <button class="tool-btn" id="pauseBtn">Pause</button>
+          <button class="tool-btn" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="canvas-frame canvas-wide">
+        <div class="gl-wrap">
+          <canvas id="glMain" width="800" height="500" tabindex="0" aria-label="Main transformation stage"></canvas>
+          <div class="gl-hud" id="mainHud">hud</div>
+        </div>
+      </div>
+
+      <div class="telemetry">
+        <div class="tele"><span>Position</span><b id="telePos">--</b></div>
+        <div class="tele"><span>Rotation</span><b id="teleRot">--</b></div>
+        <div class="tele"><span>Scale</span><b id="teleScale">--</b></div>
+        <div class="tele"><span>Order</span><b id="teleOrder">--</b></div>
+      </div>
+
+      <p class="canvas-hint">Click the canvas to place the cyan triangle there. Arrow keys slide it. Q and E turn it. Plus and minus stretch it evenly. Z and X stretch it wide. C and V stretch it tall. R resets. T flips the order. Keys 1 2 3 jump to presets. Space pauses.</p>
+
+      <div class="stage-panels">
+        <div class="side-block">
+          <h3 class="side-title">Live data</h3>
+          <div class="data-lines" id="mainData"></div>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">How it works</h3>
+          <ul class="ticks">
+            <li>Local points stay fixed in one buffer all the time.</li>
+            <li>Each frame builds a fresh matrix from position plus angle plus scale.</li>
+            <li>The matrix rides to the shader as one uniform per draw.</li>
+          </ul>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">Controls</h3>
+          <ul class="ticks">
+            <li>Continuous keys read every frame with delta time.</li>
+            <li>Single press keys reset and flip and pause.</li>
+            <li>Click writes position straight from the mouse.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAB GRID ============ -->
+    <section class="labs" id="labs">
+      <div class="lab-grid">
+
+        <article class="lab-card" id="lab-order">
+          <div class="challenge-header">
+            <span class="ch-num">LAB A</span>
+            <h2>Order changes everything</h2>
+          </div>
+          <p class="explain">
+            Same numbers and two orders side by side.
+            The cyan triangle spins where it stands.
+            The orange one travels around the middle instead.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glOrder" width="520" height="320" tabindex="0" aria-label="Transform order comparison"></canvas>
+              <div class="gl-hud" id="hudOrder">order</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Just watch. Left spins in place while right orbits.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataOrder"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Left uses translate times rotate times scale.</li>
+              <li>Right uses rotate times translate.</li>
+              <li>Same input numbers and a different picture.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-door">
+          <div class="challenge-header">
+            <span class="ch-num">LAB B</span>
+            <h2>Door hinge</h2>
+          </div>
+          <p class="explain">
+            A door swings on its hinge, marked by the bright dot.
+            The math shifts the hinge to the origin, turns, then shifts back.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glDoor" width="520" height="320" tabindex="0" aria-label="Pivot hinge demo"></canvas>
+              <div class="gl-hud" id="hudDoor">hinge</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Just watch. The panel swings around the bright dot.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataDoor"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Hinge offset moves to the origin first.</li>
+              <li>Rotation happens around the origin.</li>
+              <li>The offset moves back last of all.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-family">
+          <div class="challenge-header">
+            <span class="ch-num">LAB C</span>
+            <h2>Family plus orbit</h2>
+          </div>
+          <p class="explain">
+            Two ideas in one view.
+            The small mint triangle is a child of the cyan one and follows its parent everywhere.
+            The orange triangle circles the middle by turning a shifted shape.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glFamily" width="520" height="320" tabindex="0" aria-label="Parent child and orbit demo"></canvas>
+              <div class="gl-hud" id="hudFamily">family</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Just watch. The child rides along and the outer one loops.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataFamily"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Child world equals parent world times child local.</li>
+              <li>Orbit equals spin times shift times turn.</li>
+              <li>The middle sun only breathes and never moves.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-matrix">
+          <div class="challenge-header">
+            <span class="ch-num">LAB D</span>
+            <h2>Matrix readout</h2>
+          </div>
+          <p class="explain">
+            This card shows the actual numbers behind the stage.
+            Nine values decide where the cyan triangle lands.
+            Open the console to see the same matrix as a table.
+          </p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataMatrix"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Three columns hold turn plus scale plus shift.</li>
+              <li>The last row stays fixed for flat shapes.</li>
+              <li>Degree values turn into radians before the math.</li>
+            </ul>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Try this</h3>
+            <ul class="ticks">
+              <li>Press M to log the live matrix to the console.</li>
+              <li>Compare the readout before and after T.</li>
+              <li>Watch the middle column swing as you turn.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">© 2026 Arda Nareswara · Computer Graphics · Practicum projects</p>
+    </div>
+  </footer>
+
+  <script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+in vec2 a_position;
+uniform mat3 u_matrix;
+void main() {
+  vec3 p = u_matrix * vec3(a_position, 1.0);
+  gl_Position = vec4(p.xy, 0.0, 1.0);
+  gl_PointSize = 9.0;
+}
+  </script>
+
+  <script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision mediump float;
+uniform vec4 u_color;
+out vec4 outColor;
+void main() {
+  outColor = u_color;
+}
+  </script>
+
+  <script src="/practicum3/matrix3.js"></script>
+  <script src="/practicum3/main.js"></script>
+</body>
+</html>
