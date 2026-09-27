@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practicum 4 · Camera Playground · Computer Graphics</title>
+  <meta name="description" content="Practicum 4. An interactive WebGL2 playground for 3D camera, view matrix, perspective and orthographic projection, FOV, near and far planes, and depth test.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="../index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="back-row">
+      <a class="btn btn-back btn-outline" href="../index.html">&larr; Home</a>
+    </div>
+
+    <section class="page-head">
+      <span class="eyebrow">Practicum 4</span>
+      <h1>Camera Playground</h1>
+      <p class="lead">
+        Practicum 3 moved flat shapes with a 3 by 3 matrix. This one adds the rest
+        of the journey. A cube lives in local space, a model matrix spins it, a view
+        matrix places the camera, and a projection matrix flattens everything for the
+        screen. Every canvas below runs that full chain live.
+      </p>
+      <div class="req-strip">
+        <span class="req-chip"><b>WebGL2</b> context</span>
+        <span class="req-chip"><b>36</b> vertex cube</span>
+        <span class="req-chip">model plus view plus projection</span>
+        <span class="req-chip">perspective plus ortho</span>
+        <span class="req-chip">FOV plus near and far</span>
+        <span class="req-chip">depth on and off</span>
+        <span class="req-chip">keyboard camera</span>
+        <span class="req-chip">auto spin</span>
+      </div>
+    </section>
+
+    <!-- ============ MAIN STAGE ============ -->
+    <section class="stage" id="stage">
+      <div class="stage-head">
+        <span class="ch-num">MAIN</span>
+        <h2>The Stage</h2>
+      </div>
+      <p class="explain">
+        This is the main bench. One cube spins on its own while you fly the camera
+        around it. The cube never leaves the origin. Only the view and projection
+        change as you move, and the HUD reports every value back each frame.
+      </p>
+
+      <div class="dock">
+        <div class="tool-group" aria-label="FOV presets">
+          <button class="tool-btn" id="fov1">FOV 35</button>
+          <button class="tool-btn" id="fov2">FOV 60</button>
+          <button class="tool-btn" id="fov3">FOV 90</button>
+        </div>
+        <div class="tool-group" aria-label="Stage actions">
+          <button class="tool-btn" id="projBtn">Projection</button>
+          <button class="tool-btn" id="depthBtn">Depth</button>
+          <button class="tool-btn" id="clipBtn">Clip preset</button>
+          <button class="tool-btn" id="orbitBtn">Orbit</button>
+          <button class="tool-btn" id="tgtBtn">Target</button>
+          <button class="tool-btn" id="pauseBtn">Pause</button>
+          <button class="tool-btn" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="canvas-frame canvas-wide">
+        <div class="gl-wrap">
+          <canvas id="glMain" width="800" height="500" tabindex="0" aria-label="Main 3D camera stage"></canvas>
+          <div class="gl-hud" id="hudMain">hud</div>
+        </div>
+      </div>
+
+      <div class="telemetry">
+        <div class="tele"><span>Camera</span><b id="teleCam">--</b></div>
+        <div class="tele"><span>Projection</span><b id="teleProj">--</b></div>
+        <div class="tele"><span>FOV</span><b id="teleFov">--</b></div>
+        <div class="tele"><span>Depth</span><b id="teleDepth">--</b></div>
+      </div>
+
+      <p class="canvas-hint">Arrow keys slide the camera sideways and up and down. W moves it closer and S pulls it back. Bracket keys shrink and widen the view. Digits 1 2 and 3 jump to fixed FOV values. P flips projection and D flips depth and N steps the clip preset and O toggles orbit and T steps the target and PageUp and PageDown change height and R resets and Space pauses.</p>
+
+      <div class="stage-panels">
+        <div class="side-block">
+          <h3 class="side-title">Live data</h3>
+          <div class="data-lines" id="dataMain"></div>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">How it works</h3>
+          <ul class="ticks">
+            <li>Model spins the cube while view and projection stay separate uniforms.</li>
+            <li>Held keys move the camera every frame with delta time.</li>
+            <li>Single press keys flip one setting each and never repeat.</li>
+          </ul>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">Try this</h3>
+          <ul class="ticks">
+            <li>Press D and watch the back faces punch through the front.</li>
+            <li>Press P and compare how depth feels in each projection.</li>
+            <li>Press M to log the live matrices to the console.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAB GRID ============ -->
+    <section class="labs" id="labs">
+      <div class="lab-grid">
+
+        <article class="lab-card" id="lab-cam">
+          <div class="challenge-header">
+            <span class="ch-num">LAB A</span>
+            <h2>Camera presets</h2>
+          </div>
+          <p class="explain">
+            Same cube and same target, three camera seats. The cube never moves in
+            the world. Only the view matrix changes, and the picture follows it.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Camera presets">
+              <button class="tool-btn" id="camA">Seat A</button>
+              <button class="tool-btn" id="camB">Seat B</button>
+              <button class="tool-btn" id="camC">Seat C</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glCam" width="520" height="320" tabindex="0" aria-label="Camera position comparison"></canvas>
+              <div class="gl-hud" id="hudCam">camera</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Seats are (0,0,4) then (2,0,4) then (0,2,4). The target stays at the origin.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataCam"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Moving right turns into looking left from the new seat.</li>
+              <li>Moving up looks down at the cube from above.</li>
+              <li>View equals the inverse of the camera transform.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-target">
+          <div class="challenge-header">
+            <span class="ch-num">LAB B</span>
+            <h2>Target plus up</h2>
+          </div>
+          <p class="explain">
+            The camera stays parked while its gaze wanders. Shifting the target
+            steers the view direction, and tilting the up vector rolls the picture.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Target presets">
+              <button class="tool-btn" id="tgt0">Mid</button>
+              <button class="tool-btn" id="tgtL">Left</button>
+              <button class="tool-btn" id="tgtR">Right</button>
+            </div>
+            <div class="tool-group" aria-label="Up toggle">
+              <button class="tool-btn" id="upBtn">Up vector</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glTarget" width="520" height="320" tabindex="0" aria-label="Target and up comparison"></canvas>
+              <div class="gl-hud" id="hudTarget">target</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Targets are origin then (1,0,0) then (minus 1,0,0). The up toggle rolls the frame sideways.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataTarget"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Forward equals target minus position, normalized.</li>
+              <li>Right comes from crossing forward with up.</li>
+              <li>Position plus target alone leave roll undecided until up joins.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-split">
+          <div class="challenge-header">
+            <span class="ch-num">LAB C</span>
+            <h2>Split projection</h2>
+          </div>
+          <p class="explain">
+            Two views of the same moment. The left half uses perspective and the
+            right half uses orthographic, with one shared model and camera state.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glSplit" width="520" height="320" tabindex="0" aria-label="Perspective versus orthographic split view"></canvas>
+              <div class="gl-hud" id="hudSplit">split</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Just watch. Both halves spin together and only the projection differs.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataSplit"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Perspective shrinks far geometry and feels natural.</li>
+              <li>Orthographic keeps sizes stable and feels technical.</li>
+              <li>Same matrices in, two projections out.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-depth">
+          <div class="challenge-header">
+            <span class="ch-num">LAB D</span>
+            <h2>Depth trio</h2>
+          </div>
+          <p class="explain">
+            Three cubes at three depths share one screen. With depth on, the near
+            cube correctly hides the far ones. With depth off, draw order decides
+            and the picture lies.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Depth actions">
+              <button class="tool-btn" id="depthLabBtn">Depth</button>
+              <button class="tool-btn" id="clipLabBtn">Clip preset</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glDepth" width="520" height="320" tabindex="0" aria-label="Multiple cube depth test"></canvas>
+              <div class="gl-hud" id="hudDepth">depth</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Cubes sit at z zero and minus 1.5 and plus 1.5. The clip button steps the same near and far presets as the stage.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataDepth"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Depth buffer keeps the closest fragment per pixel.</li>
+              <li>Without it the last drawn triangle wins, near or far.</li>
+              <li>Tight clips slice cubes while loose clips waste precision.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-fov">
+          <div class="challenge-header">
+            <span class="ch-num">LAB E</span>
+            <h2>FOV plus aspect</h2>
+          </div>
+          <p class="explain">
+            The lens bench. Narrow FOV zooms in and wide FOV stretches the edges.
+            The aspect toggle swaps the canvas shape to prove the projection must
+            follow the real viewport.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="FOV presets">
+              <button class="tool-btn" id="labFov35">35</button>
+              <button class="tool-btn" id="labFov60">60</button>
+              <button class="tool-btn" id="labFov90">90</button>
+            </div>
+            <div class="tool-group" aria-label="Aspect toggle">
+              <button class="tool-btn" id="aspectBtn">Aspect</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glFov" width="520" height="320" tabindex="0" aria-label="FOV and aspect comparison"></canvas>
+              <div class="gl-hud" id="hudFov">fov</div>
+            </div>
+          </div>
+          <p class="canvas-hint">FOV steps through 35 then 60 then 90 degrees. Aspect swaps square and wide canvas shapes.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataFov"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Small FOV narrows the view and reads as zoom.</li>
+              <li>Large FOV widens the view and bends the edges.</li>
+              <li>Wrong aspect stretches the cube like a bad projector.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">© 2026 Arda Nareswara · Computer Graphics · Practicum projects</p>
+    </div>
+  </footer>
+
+  <script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+in vec3 a_position;
+in vec3 a_color;
+uniform mat4 u_model;
+uniform mat4 u_view;
+uniform mat4 u_projection;
+out vec3 v_color;
+void main() {
+  gl_Position = u_projection * u_view * u_model * vec4(a_position, 1.0);
+  v_color = a_color;
+}
+  </script>
+
+  <script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision highp float;
+in vec3 v_color;
+out vec4 outColor;
+void main() {
+  outColor = vec4(v_color, 1.0);
+}
+  </script>
+
+  <script src="math3d.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
