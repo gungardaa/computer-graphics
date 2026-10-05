@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practicum 5 - Textured and Lit Cube Playground - Computer Graphics</title>
+  <meta name="description" content="Practicum 5. An interactive WebGL2 playground for surface normals, ambient plus diffuse plus specular lighting, texture sampling, filtering, wrapping, and light control.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/practicum5/styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="../index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="back-row">
+      <a class="btn btn-back btn-outline" href="../index.html">Back to Home</a>
+    </div>
+
+    <section class="page-head">
+      <span class="eyebrow">Practicum 5</span>
+      <h1>Textured and Lit Cube Playground</h1>
+      <p class="lead">
+        Practicum 4 answered where an object is. This one answers how its surface
+        looks. Every vertex now carries a position plus a normal plus a UV pair.
+        The vertex shader moves all three into place. The fragment shader samples
+        a texture and adds ambient plus diffuse plus specular light. Every panel
+        below runs that full chain live.
+      </p>
+      <div class="req-strip">
+        <span class="req-chip"><b>WebGL2</b> context</span>
+        <span class="req-chip">position plus <b>normal</b> plus <b>UV</b></span>
+        <span class="req-chip"><b>flat</b> and <b>smooth</b> shading</span>
+        <span class="req-chip"><b>ambient</b> plus <b>diffuse</b> plus <b>specular</b></span>
+        <span class="req-chip"><b>checker</b> and <b>image</b> texture</span>
+        <span class="req-chip"><b>NEAREST</b> and <b>LINEAR</b></span>
+        <span class="req-chip"><b>3</b> wrapping modes</span>
+        <span class="req-chip">keyboard <b>light</b> and <b>camera</b></span>
+      </div>
+    </section>
+
+    <!-- ============ MAIN STAGE ============ -->
+    <section class="stage" id="stage">
+      <div class="stage-head">
+        <span class="ch-num">MAIN</span>
+        <h2>The Stage</h2>
+      </div>
+      <p class="explain">
+        This is the main bench. One cube spins on its own while you move the
+        light around it. The geometry never changes. Only light direction, camera
+        position, and sampling settings change, and the HUD reports every value
+        back each frame.
+      </p>
+
+      <div class="control-split">
+      <div class="control-col control-side">
+      <div class="panel-grid">
+        <div class="panel-cell"><span class="panel-label">Shading</span><select id="selShading" aria-label="Shading mode"><option value="FLAT">Flat</option><option value="SMOOTH">Smooth</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Filter</span><select id="selFilter" aria-label="Texture filtering"><option value="LINEAR">Linear</option><option value="NEAREST">Nearest</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Wrap</span><select id="selWrap" aria-label="Texture wrapping"><option value="0">Repeat</option><option value="1">Clamp</option><option value="2">Mirror</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Mipmap</span><select id="selMipS" aria-label="Mipmap filtering mode"><option value="0">Off</option><option value="1">Linear</option><option value="2">Nearest</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Texture</span><button class="tool-btn" id="btnTexModeS">Texture: Off</button></div>
+        <div class="panel-cell"><span class="panel-label">Orbit</span><button class="tool-btn" id="btnOrbitModeS">Orbit: Off</button></div>
+        <div class="panel-cell"><span class="panel-label">Pause</span><button class="tool-btn" id="btnPause">Pause</button></div>
+        <div class="panel-cell"><span class="panel-label">Reset</span><button class="tool-btn" id="btnReset">Reset</button></div>
+      </div>
+      </div>
+      <div class="control-col">
+      <div class="dock">
+        <div class="slider-row"><label for="sAmb">Ambient</label><input type="range" id="sAmb" min="0" max="1" step="0.01" value="0.18"><b id="sAmbVal">0.18</b></div>
+        <div class="slider-row"><label for="sShine">Shine</label><input type="range" id="sShine" min="2" max="128" step="1" value="32"><b id="sShineVal">32</b></div>
+        <div class="slider-row"><label for="sUV">UV</label><input type="range" id="sUV" min="0.25" max="5" step="0.05" value="1"><b id="sUVVal">1.00</b></div>
+      </div>
+      <div class="dock">
+        <div class="slider-row"><label for="sLX">Light X</label><input type="range" id="sLX" min="-4" max="4" step="0.05" value="2"><b id="sLXVal">2.00</b></div>
+        <div class="slider-row"><label for="sLY">Light Y</label><input type="range" id="sLY" min="-1" max="4" step="0.05" value="2"><b id="sLYVal">2.00</b></div>
+        <div class="slider-row"><label for="sLZ">Light Z</label><input type="range" id="sLZ" min="-4" max="4" step="0.05" value="2"><b id="sLZVal">2.00</b></div>
+      </div>
+      <div class="dock">
+        <div class="slider-row"><label for="sCX">Cam X</label><input type="range" id="sCX" min="-3" max="3" step="0.05" value="0"><b id="sCXVal">0.00</b></div>
+        <div class="slider-row"><label for="sCY">Cam Y</label><input type="range" id="sCY" min="-1" max="3" step="0.05" value="1.4"><b id="sCYVal">1.40</b></div>
+        <div class="slider-row"><label for="sCZ">Cam Z</label><input type="range" id="sCZ" min="2" max="8" step="0.05" value="4"><b id="sCZVal">4.00</b></div>
+      </div>
+      </div>
+      </div>
+
+      <div class="canvas-frame canvas-wide">
+        <div class="gl-wrap">
+          <canvas id="glMain" width="800" height="500" tabindex="0" aria-label="Main lit and textured cube stage"></canvas>
+          <div class="gl-hud" id="hudMain">hud</div>
+        </div>
+      </div>
+
+      <div class="telemetry">
+        <div class="tele"><span>Shading</span><b id="teleShade">--</b></div>
+        <div class="tele"><span>Texture</span><b id="teleTex">--</b></div>
+        <div class="tele"><span>Light</span><b id="teleLight">--</b></div>
+        <div class="tele"><span>Camera</span><b id="teleCam">--</b></div>
+      </div>
+
+      <p class="canvas-hint">Arrow keys move the light on X and Y. W moves it closer and S pulls it back. I and J and K and L move the camera. U moves it closer and O pulls it back. A raises ambient and Z lowers it. Bracket keys change UV scale. Minus and Plus change shininess. Sliders mirror all nine values both ways and dropdowns mirror shading plus filtering plus wrapping plus mipmap. F flips shading and T flips filtering and G flips wrapping and V flips texture and M flips mipmap and N flips scale and B flips normal matrix and Y flips orbit and 1 and 2 and 3 flip light parts and 0 flips lighting and X flips normalize and R resets and Space pauses.</p>
+
+      <div class="stage-panels">
+        <div class="side-block">
+          <h3 class="side-title">Live data</h3>
+          <div class="data-lines" id="dataMain"></div>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">How it works</h3>
+          <ul class="ticks">
+            <li>Position finds the surface. Normal faces the light. UV picks the texel.</li>
+            <li>Held keys move light and camera every frame with delta time.</li>
+            <li>Single press keys flip one setting each and never repeat.</li>
+          </ul>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">Try this</h3>
+          <ul class="ticks">
+            <li>Press F and watch face edges turn into a rounded glow.</li>
+            <li>Press 0 and compare flat texture against lit texture.</li>
+            <li>Press X and read how raw normals skew edge brightness.</li>
+            <li>Park the light, drag Cam X, and watch the shine walk alone.</li>
+            <li>Raise UV scale past 2 and press G to see wrapping change.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE LABS ============ -->
+    <section class="labs" id="labs">
+      <div class="lab-grid">
+
+        <article class="lab-card" id="lab-a">
+          <div class="challenge-header">
+            <span class="ch-num">A</span>
+            <h2>Image texture</h2>
+          </div>
+          <p class="explain">
+            The stage can sample two sources. The checker is drawn in code so the
+            page works offline. The photo loads from the local assets folder. Both
+            flow through the same sampler and the same lighting.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Texture source">
+              <button class="tool-btn" id="btnTexMode">Texture: Photo</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glA" width="520" height="320" tabindex="0" aria-label="Checker versus photo texture"></canvas>
+              <div class="gl-hud" id="hudA">texture</div>
+            </div>
+          </div>
+          <p class="canvas-hint">This cube locks to the photo once it loads. Flip to compare both sources under fixed light.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="texStatus"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>The button names the live source and swaps only this cube.</li>
+              <li>The photo needs a local server. The checker always works.</li>
+              <li>Filtering and wrapping apply to both sources alike.</li>
+            </ul>
+          </div>
+        </article>
+
+
+        <article class="lab-card" id="lab-d">
+          <div class="challenge-header">
+            <span class="ch-num">B</span>
+            <h2>Scale and normal matrix</h2>
+          </div>
+          <p class="explain">
+            Stretching a cube with plain rotation math tilts its normals away from
+            the surface. The inverse transpose matrix keeps them square. This lab
+            shows both paths on the same stretched cube.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Scale mode">
+              <button class="tool-btn" id="btnScaleMode">Scale: Uniform</button>
+            </div>
+            <div class="tool-group" aria-label="Normal matrix mode">
+              <button class="tool-btn" id="btnMatrixMode">Matrix: Correct</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glScale" width="520" height="320" tabindex="0" aria-label="Non uniform scale comparison"></canvas>
+              <div class="gl-hud" id="hudScale">scale</div>
+            </div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataScale"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>The stretch button drives only this cube.</li>
+              <li>The matrix button swaps correct with naive here.</li>
+              <li>Naive lighting looks skewed on stretched faces.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-e">
+          <div class="challenge-header">
+            <span class="ch-num">C</span>
+            <h2>Light orbit</h2>
+          </div>
+          <p class="explain">
+            The point light can circle the cube on its own. Toggle orbit and the
+            brightness sweeps each face in turn. Toggle back for manual control.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Orbit actions">
+              <button class="tool-btn" id="btnOrbitMode">Orbit: Off</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glE" width="520" height="320" tabindex="0" aria-label="Orbiting light"></canvas>
+              <div class="gl-hud" id="hudE">orbit</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Brightness sweeps each face in turn while the cube spins beneath it.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="orbitStatus"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Off and On drive only this orbit. The button names the live state.</li>
+              <li>Orbit writes light X and Z from sine and cosine.</li>
+              <li>Diffuse and specular follow the moving direction.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-f">
+          <div class="challenge-header">
+            <span class="ch-num">D</span>
+            <h2>Light parts toggle</h2>
+          </div>
+          <p class="explain">
+            Each lighting term can be cut alone. Kill ambient to see pure direct
+            light. Kill diffuse to see glow plus shine. Kill specular to drop the
+            highlight only.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Component toggles">
+              <button class="tool-btn" id="btnAmbTgl">Ambient</button>
+              <button class="tool-btn" id="btnDifTgl">Diffuse</button>
+              <button class="tool-btn" id="btnSpcTgl">Specular</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glF" width="520" height="320" tabindex="0" aria-label="Lighting components"></canvas>
+              <div class="gl-hud" id="hudF">parts</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Cut terms one by one and read what each one added to the mix.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="compStatus"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>The three buttons flip only this cube.</li>
+              <li>Texture stays on so the base color never lies.</li>
+              <li>All three off leaves black plus checker edges.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-g">
+          <div class="challenge-header">
+            <span class="ch-num">E</span>
+            <h2>Mipmap filtering</h2>
+          </div>
+          <p class="explain">
+            Plain LINEAR samples one level. Mipmap modes blend levels by distance.
+            This lab parks its camera far back so the gap between modes is easy
+            to read on the small checker.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Mipmap mode">
+              <select id="selMip" aria-label="Mipmap filtering mode">
+                <option value="0">Mipmap: Off</option>
+                <option value="1">Mipmap: Linear</option>
+                <option value="2">Mipmap: Nearest</option>
+              </select>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glMip" width="520" height="320" tabindex="0" aria-label="Mipmap filtering comparison"></canvas>
+              <div class="gl-hud" id="hudMip">mipmap</div>
+            </div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataMip"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>The dropdown steps only this cube. The far cube calms under mipmaps.</li>
+              <li>The far cube shimmers under plain modes and calms under mipmaps.</li>
+              <li>Min filter carries the mode. Mag filter stays plain.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">Practicum 5 by Arda Nareswara - Computer Graphics - Practicum projects</p>
+    </div>
+  </footer>
+
+  <script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+in vec3 a_position;
+in vec3 a_normal;
+in vec2 a_texCoord;
+uniform mat4 u_model;
+uniform mat4 u_view;
+uniform mat4 u_projection;
+uniform mat3 u_normalMatrix;
+uniform float u_uvScale;
+out vec3 v_worldPosition;
+out vec3 v_normal;
+out vec2 v_texCoord;
+void main() {
+  vec4 worldPosition = u_model * vec4(a_position, 1.0);
+  v_worldPosition = worldPosition.xyz;
+  v_normal = u_normalMatrix * a_normal;
+  v_texCoord = a_texCoord * u_uvScale;
+  gl_Position = u_projection * u_view * worldPosition;
+}
+  </script>
+
+  <script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision highp float;
+in vec3 v_worldPosition;
+in vec3 v_normal;
+in vec2 v_texCoord;
+uniform vec3 u_lightPosition;
+uniform vec3 u_lightColor;
+uniform vec3 u_cameraPosition;
+uniform float u_ambientStrength;
+uniform float u_shininess;
+uniform sampler2D u_texture;
+uniform float u_useAmbient;
+uniform float u_useDiffuse;
+uniform float u_useSpecular;
+uniform float u_useNormalize;
+uniform float u_useLighting;
+out vec4 outColor;
+void main() {
+  vec3 N = v_normal;
+  if (u_useNormalize > 0.5) {
+    N = normalize(v_normal);
+  }
+  vec3 L = normalize(u_lightPosition - v_worldPosition);
+  vec3 V = normalize(u_cameraPosition - v_worldPosition);
+  float diff = max(dot(N, L), 0.0);
+  vec3 R = reflect(-L, N);
+  float spec = 0.0;
+  if (diff > 0.0) {
+    spec = pow(max(dot(R, V), 0.0), u_shininess);
+  }
+  vec3 texColor = texture(u_texture, v_texCoord).rgb;
+  if (u_useLighting < 0.5) {
+    outColor = vec4(texColor, 1.0);
+    return;
+  }
+  vec3 ambient = u_useAmbient * u_ambientStrength * texColor;
+  vec3 diffuse = u_useDiffuse * diff * u_lightColor * texColor;
+  vec3 specular = u_useSpecular * spec * u_lightColor;
+  outColor = vec4(ambient + diffuse + specular, 1.0);
+}
+  </script>
+
+  <script src="/practicum5/math3d.js"></script>
+  <script src="/practicum5/main.js"></script>
+</body>
+</html>
+
+
+
+
