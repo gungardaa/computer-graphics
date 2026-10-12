@@ -6,10 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const run = (cmd, cwd) => execSync(cmd, { cwd, stdio: "inherit", shell: true });
 
-// ponytail: P1-P5 copy byte exact, only P6 goes through vite build.
-// Upgrade to full MPA build only if static copy ever diverges.
-run("npm install --no-audit --no-fund", join(root, "practicum6"));
-run("npm run build", join(root, "practicum6"));
+run("npx vite build practicum6", root);
 
 const deploy = join(root, "deploy");
 rmSync(deploy, { recursive: true, force: true });
