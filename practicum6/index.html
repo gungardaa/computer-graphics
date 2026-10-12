@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practicum 6 - Three.js Mini 3D Scene - Computer Graphics</title>
+  <meta name="description" content="Practicum 6. A Mini 3D Scene built with Three.js covering scene plus camera plus renderer plus geometry plus material plus light plus shadow plus animation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="../index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="back-row">
+      <a class="btn btn-back btn-outline" href="../index.html">Back to Home</a>
+    </div>
+
+    <section class="page-head">
+      <span class="eyebrow">Practicum 6</span>
+      <h1>Three.js Mini 3D Scene</h1>
+      <p class="lead">
+        Meetings 2 through 5 built 3D by hand with buffers plus shaders plus
+        matrices. This page keeps every idea and hands the heavy lifting to
+        Three.js as a thin layer above WebGL. One cube plus one sphere plus one
+        ground plane share one light rig plus one shadow chain plus one delta
+        driven loop. Everything below runs live.
+      </p>
+      <div class="req-strip">
+        <span class="req-chip"><b>Three.js</b> scene</span>
+        <span class="req-chip"><b>60</b> degree camera</span>
+        <span class="req-chip"><b>Box</b> plus <b>Sphere</b> plus <b>Plane</b></span>
+        <span class="req-chip"><b>4</b> materials tested</span>
+        <span class="req-chip"><b>Ambient</b> plus <b>Directional</b></span>
+        <span class="req-chip"><b>Shadow</b> chain on</span>
+        <span class="req-chip"><b>Delta</b> animation</span>
+        <span class="req-chip"><b>8</b> challenge labs</span>
+      </div>
+    </section>
+
+    <!-- ============ MAIN STAGE ============ -->
+    <section class="stage" id="stage">
+      <div class="stage-head">
+        <span class="ch-num">MAIN</span>
+        <h2>The Stage</h2>
+      </div>
+      <p class="explain">
+        This is the full Mini 3D Scene from the module. A Lambert cube spins on
+        the left and a Phong sphere floats on the right and both throw shadows
+        onto a Lambert ground over a glowing grid. The panel drives all eleven
+        trials without leaving this canvas. Each button names its live state.
+      </p>
+
+      <div class="control-split">
+      <div class="control-col control-side">
+      <div class="panel-grid">
+        <div class="panel-cell"><span class="panel-label">Segments</span><select id="selSeg" aria-label="Sphere segments"><option value="low">Low</option><option value="med" selected>Med</option><option value="high">High</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Cube mat</span><select id="selCMat" aria-label="Cube material"><option value="basic">Basic</option><option value="lambert" selected>Lambert</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Sphere</span><button class="tool-btn" id="btnNormal">Sphere. Phong</button></div>
+        <div class="panel-cell"><span class="panel-label">Lights</span><button class="tool-btn" id="btnLight">Lights. On</button></div>
+        <div class="panel-cell"><span class="panel-label">FOV</span><select id="selFov" aria-label="Camera FOV"><option value="35">35</option><option value="60" selected>60</option><option value="90">90</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Dir power</span><select id="selDir" aria-label="Directional power"><option value="0.3">0.3</option><option value="1">1.0</option><option value="2" selected>2.0</option><option value="4">4.0</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Shadow</span><button class="tool-btn" id="btnShRen">Shadow. On</button></div>
+        <div class="panel-cell"><span class="panel-label">Pause</span><button class="tool-btn" id="btnPause">Pause</button></div>
+      </div>
+      </div>
+      <div class="control-col">
+      <div class="dock">
+        <div class="slider-row"><label for="sPX">Move X</label><input type="range" id="sPX" min="-3" max="1" step="0.05" value="-1.2" /><b id="sPXVal">-1.20</b></div>
+        <div class="slider-row"><label for="sRY">Spin Y</label><input type="range" id="sRY" min="0" max="3.14" step="0.01" value="0.8" /><b id="sRYVal">0.80</b></div>
+        <div class="slider-row"><label for="sSY">Scale Y</label><input type="range" id="sSY" min="0.3" max="2" step="0.01" value="1" /><b id="sSYVal">1.00</b></div>
+      </div>
+      <div class="dock">
+        <div class="slider-row"><label for="sDir">Directional</label><input type="range" id="sDir" min="0" max="4" step="0.05" value="2" /><b id="sDirVal">2.00</b></div>
+        <div class="slider-row"><label for="sAmb">Ambient</label><input type="range" id="sAmb" min="0" max="1" step="0.01" value="0.35" /><b id="sAmbVal">0.35</b></div>
+      </div>
+      <div class="dock">
+        <div class="tool-group" aria-label="Shadow links">
+          <button class="tool-btn" id="btnShCast">Casters. On</button>
+          <button class="tool-btn" id="btnShRecv">Ground. On</button>
+        </div>
+        <div class="tool-group" aria-label="Loop modes">
+          <button class="tool-btn" id="btnDelta">Delta. On</button>
+          <button class="tool-btn" id="btnProj">Aspect. On</button>
+        </div>
+      </div>
+      </div>
+      </div>
+
+      <div class="canvas-frame canvas-wide">
+        <div class="gl-wrap">
+          <canvas id="glMain" width="800" height="500" tabindex="0" aria-label="Main Mini 3D Scene"></canvas>
+          <div class="gl-hud" id="hudMain">loading</div>
+        </div>
+      </div>
+
+      <div class="telemetry">
+        <div class="tele"><span>Verts</span><b id="teleVerts">--</b></div>
+        <div class="tele"><span>Material</span><b id="teleMat">--</b></div>
+        <div class="tele"><span>Light</span><b id="teleLight">--</b></div>
+        <div class="tele"><span>Camera</span><b id="teleCam">--</b></div>
+      </div>
+
+      <p class="canvas-hint">Focus the canvas then press Space to pause. Drag the sliders to reshape the cube and the light. Flip cube Basic against Lambert with lights off to feel trial 3.</p>
+
+      <div class="stage-panels">
+        <div class="side-block">
+          <h3 class="side-title">Live data</h3>
+          <div class="data-lines" id="dataMain"></div>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">How it works</h3>
+          <ul class="ticks">
+            <li>Geometry answers shape and material answers shading and mesh joins both.</li>
+            <li>Position plus rotation plus scale build the model matrix behind the scenes.</li>
+            <li>One clock shares delta across all nine canvases on this page.</li>
+          </ul>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">Try this</h3>
+          <ul class="ticks">
+            <li>Set segments Low then High and watch vertex count jump in Live data.</li>
+            <li>Kill lights with Basic cube to see why Basic never needs light.</li>
+            <li>Turn Aspect off then resize the window to break the image on purpose.</li>
+            <li>Flip Delta off to feel fixed step judder on fast screens.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE LABS ============ -->
+    <section class="labs" id="labs">
+      <div class="lab-grid">
+
+        <article class="lab-card" id="lab-a">
+          <div class="challenge-header">
+            <span class="ch-num">A</span>
+            <h2>Extra geometry</h2>
+          </div>
+          <p class="explain">
+            Cylinder plus cone plus torus stand apart with own materials and own
+            poses. All three share one light rig plus one ground plus one grid.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glA" width="520" height="320" tabindex="0" aria-label="Extra geometry lab"></canvas>
+              <div class="gl-hud" id="hudA">extra</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Just watch. Poses never overlap so shadows stay readable.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataA"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Three shapes share one light rig and one ground.</li>
+              <li>Each spins on its own axis with delta timing.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-b">
+          <div class="challenge-header">
+            <span class="ch-num">B</span>
+            <h2>Material gallery</h2>
+          </div>
+          <p class="explain">
+            One sphere shape four times with Basic plus Normal plus Lambert plus
+            Phong side by side. Same geometry feeds all four meshes in a row.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glB" width="520" height="320" tabindex="0" aria-label="Material gallery lab"></canvas>
+              <div class="gl-hud" id="hudB">mats</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Only Basic stays bright when lights dim. The rest need light.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataB"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Same geometry feeds four meshes in a row.</li>
+              <li>Normal paint follows surface direction with no light at all.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-c">
+          <div class="challenge-header">
+            <span class="ch-num">C</span>
+            <h2>Ortho camera</h2>
+          </div>
+          <p class="explain">
+            Second camera in orthographic mode. Flip projection while focused and
+            both cameras track resize without skew.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Camera mode">
+              <button class="tool-btn" id="btnPersp">View. Perspective</button>
+              <button class="tool-btn" id="btnOrtho">View. Ortho</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glC" width="520" height="320" tabindex="0" aria-label="Orthographic camera lab"></canvas>
+              <div class="gl-hud" id="hudC">persp</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Focus then press P. Flip only touches this lab.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataC"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Ortho frustum derives from aspect so resize never skews.</li>
+              <li>The buttons name the live camera like the stage does.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-d">
+          <div class="challenge-header">
+            <span class="ch-num">D</span>
+            <h2>Orbiting light</h2>
+          </div>
+          <p class="explain">
+            Directional light circles the pair while a small marker shows its live
+            seat. Shading plus shadow sweep with the marker.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Orbit toggle">
+              <button class="tool-btn" id="btnOrbit">Orbit. On</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glD" width="520" height="320" tabindex="0" aria-label="Orbiting light lab"></canvas>
+              <div class="gl-hud" id="hudD">orbit</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Light X follows cosine and light Z follows sine.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataD"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Angle advances with delta on a circle of radius 4.</li>
+              <li>Marker copies the light seat every frame.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-e">
+          <div class="challenge-header">
+            <span class="ch-num">E</span>
+            <h2>Shadow quality</h2>
+          </div>
+          <p class="explain">
+            Same shadow chain at three map sizes. Higher means crisper edges at
+            higher cost. Scene scale stays fixed so edges compare fairly.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Shadow map size">
+              <button class="tool-btn" data-shadow="512">Map. 512</button>
+              <button class="tool-btn" data-shadow="1024">Map. 1024</button>
+              <button class="tool-btn" data-shadow="2048">Map. 2048</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glE" width="520" height="320" tabindex="0" aria-label="Shadow quality lab"></canvas>
+              <div class="gl-hud" id="hudE">1024</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Size swap disposes the old map so the new one takes over.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataE"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Map size sets memory plus detail in one move.</li>
+              <li>1024 is the sweet seat for this scene scale.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-f">
+          <div class="challenge-header">
+            <span class="ch-num">F</span>
+            <h2>Scene readout</h2>
+          </div>
+          <p class="explain">
+            Full HUD with camera seat plus object count plus triangle count plus
+            FPS plus live materials. Triangle count reads renderer info after each
+            draw.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glF" width="520" height="320" tabindex="0" aria-label="Scene readout lab"></canvas>
+              <div class="gl-hud" id="hudF">info</div>
+            </div>
+          </div>
+          <p class="canvas-hint">FPS smooths delta so the number stays calm.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataF"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Triangle count reads renderer info after each draw.</li>
+              <li>Abstraction still costs real triangles behind the call.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-g">
+          <div class="challenge-header">
+            <span class="ch-num">G</span>
+            <h2>Pause toggle</h2>
+          </div>
+          <p class="explain">
+            Event key Space flips motion once per press while the loop keeps
+            drawing. One boolean gates updates and never gates rendering.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Pause toggle">
+              <button class="tool-btn" id="btnG">Running</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glG" width="520" height="320" tabindex="0" aria-label="Pause toggle lab"></canvas>
+              <div class="gl-hud" id="hudG">run</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Focus then press Space. Button mirrors the same flag.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataG"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Key repeat guards so held Space flips once.</li>
+              <li>Rendering continues while motion holds still.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-h">
+          <div class="challenge-header">
+            <span class="ch-num">H</span>
+            <h2>Drive the cube</h2>
+          </div>
+          <p class="explain">
+            State keys glide the cube on arrows and twist it on Q plus E with delta
+            timing. Held key set reads every frame so diagonals work.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Reset cube">
+              <button class="tool-btn" id="btnHReset">Reset</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glH" width="520" height="320" tabindex="0" aria-label="Drive the cube lab"></canvas>
+              <div class="gl-hud" id="hudH">drive</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Focus then hold arrows to glide and Q plus E to twist.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataH"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Motion scales with delta and clamps to the ground.</li>
+              <li>Blur clears held keys so motion never sticks.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">Practicum 6 by Arda Nareswara - Computer Graphics - Practicum projects</p>
+    </div>
+  </footer>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
