@@ -1,9 +1,14 @@
+/*
+Practicum 6 - Three.js
+
+Name : Anak Agung Putu Arda Nareswara
+NRP  : 5025241074
+Class: B
+
+*/
+
 import * as THREE from "three";
 import "./style.css";
-
-/* Mini 3D Scene. One shared loop drives nine small rigs.
-   Each rig owns its scene plus camera plus renderer so a lab
-   never touches another lab. Rung 2 reuse, one helper set. */
 
 const $ = (id) => document.getElementById(id);
 const CALM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -34,7 +39,6 @@ function onSelect(id, fn) {
   el.addEventListener("change", () => fn(el.value));
 }
 
-// ponytail: fixed canvas buffers scaled by CSS, per canvas resize skipped.
 // Upgrade to container observers if canvases ever go fluid.
 const RIGS = [];
 let fps = 60;
