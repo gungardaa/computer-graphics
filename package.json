@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/assemble.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview --outDir deploy"
   },
   "devDependencies": {
     "vite": "^5.4.0"

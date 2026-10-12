@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const run = (cmd, cwd) => execSync(cmd, { cwd, stdio: "inherit", shell: true });
 
-run("npx vite build practicum6", root);
+run("npx vite build practicum6 --base=./", root);
 
 const deploy = join(root, "deploy");
 rmSync(deploy, { recursive: true, force: true });
