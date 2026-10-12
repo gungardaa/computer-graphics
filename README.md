@@ -47,7 +47,7 @@ Build the project for production:
 npm run build
 ```
 
-The production files will be generated in the `dist/` folder.
+The production files will be generated in the `deploy/` folder.
 
 ## Preview
 
