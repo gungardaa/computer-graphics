@@ -1,6 +1,6 @@
 # Computer Graphics Practicum
 
-A collection of Computer Graphics practicum projects, covering Practicum 1 through Practicum 6.
+A collection of Computer Graphics practicum projects, covering Practicum 1 through Practicum 7.
 
 ## Project Structure
 
@@ -12,6 +12,7 @@ Grafika Komputer/
 ├── practicum4/
 ├── practicum5/
 ├── practicum6/
+├── practicum7/
 ├── scripts/
 ├── index.html
 ├── styles.css
@@ -21,7 +22,7 @@ Grafika Komputer/
 └── vite.config.js
 ```
 
-Each practicum contains its own HTML, JavaScript, and CSS files. Practicum 6 uses Three.js and is integrated into the root Vite project.
+Each practicum contains its own HTML, JavaScript, and CSS files. Practicum 6 and Practicum 7 use Three.js and are integrated into the root Vite project.
 
 ## Getting Started
 

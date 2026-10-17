@@ -1,11 +1,6 @@
-/*
-Practicum 6 - Three.js
-
-Name : Anak Agung Putu Arda Nareswara
-NRP  : 5025241074
-Class: B
-
-*/
+/* Nama: Anak Agung Putu Arda Nareswara
+NRP: 5025241074
+Kelas: B */
 
 import * as THREE from "three";
 import "./style.css";

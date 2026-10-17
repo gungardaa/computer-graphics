@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practicum 7 - Three.js Interactive 3D Application - Computer Graphics</title>
+  <meta name="description" content="Practicum 7. An interactive 3D application with Three.js covering scene graph, parent child hierarchy, PBR materials, an imported animated GLB, raycasting, hover, click selection, and environment lighting." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="nav-brand" href="../index.html">Computer Graphics</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#practicums">Practicums</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="back-row">
+      <a class="btn btn-back btn-outline" href="../index.html">Back to Home</a>
+    </div>
+
+    <section class="page-head">
+      <span class="eyebrow">Practicum 7</span>
+      <h1>Interactive 3D Prototype</h1>
+      <p class="lead">
+        Meeting 6 built a static Mini 3D Scene. This page turns it into an
+        interactive application. One group shows parent and child hierarchy
+        with live local and world readouts. One sphere shows roughness and
+        metalness against a procedural environment. One imported GLB robot
+        brings real hierarchy plus skinning plus fourteen animation clips.
+        OrbitControls explores the scene while raycasting links the pointer to
+        the objects, so hover and click each hold their own state. Every
+        experiment below runs live in one stage.
+      </p>
+      <div class="req-strip">
+        <span class="req-chip"><b>Three.js</b> scene</span>
+        <span class="req-chip"><b>Orbit</b> controls with limits</span>
+        <span class="req-chip"><b>Parent</b> plus <b>child</b> hierarchy</span>
+        <span class="req-chip"><b>PBR</b> roughness and metalness</span>
+        <span class="req-chip"><b>GLB</b> robot plus <b>14</b> clips</span>
+        <span class="req-chip"><b>Raycast</b> hover plus click</span>
+        <span class="req-chip"><b>Environment</b> map</span>
+        <span class="req-chip"><b>8</b> challenge labs</span>
+      </div>
+    </section>
+
+    <!-- ============ MAIN STAGE ============ -->
+    <section class="stage" id="stage">
+      <div class="stage-head">
+        <span class="ch-num">MAIN</span>
+        <h2>The Stage</h2>
+      </div>
+      <p class="explain">
+        This is the full prototype from the module. A hierarchy demo group sits
+        on the left with a body plus a head plus a small child box that tumbles.
+        A lit green sphere in the middle carries live roughness and metalness.
+        An imported GLB robot on the right runs its animation through an
+        AnimationMixer with delta time while its whole hierarchy casts shadow.
+        Drag to orbit, scroll to zoom, right drag to pan. A plain click selects,
+        a drag never does.
+      </p>
+
+      <div class="control-split">
+      <div class="control-col control-side">
+      <div class="panel-grid">
+        <div class="panel-cell"><span class="panel-label">Camera</span><select id="selCam" aria-label="Camera mode"><option value="persp" selected>Persp</option><option value="ortho">Ortho</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Clip</span><select id="selClip" aria-label="Animation clip"><option value="">loading</option></select></div>
+        <div class="panel-cell"><span class="panel-label">Environment</span><button class="tool-btn" id="btnEnv">Env. On</button></div>
+        <div class="panel-cell"><span class="panel-label">Raycast</span><button class="tool-btn" id="btnRay">Recursive. On</button></div>
+        <div class="panel-cell"><span class="panel-label">Shadow</span><button class="tool-btn" id="btnShadow">Shadow. On</button></div>
+        <div class="panel-cell"><span class="panel-label">Loop</span><button class="tool-btn" id="btnPause">Pause</button></div>
+        <div class="panel-cell"><span class="panel-label">Log</span><button class="tool-btn" id="btnLog">Transforms</button></div>
+        <div class="panel-cell"><span class="panel-label">Camera reset</span><button class="tool-btn" id="btnReset">Reset</button></div>
+      </div>
+      </div>
+      <div class="control-col">
+      <div class="dock">
+        <div class="slider-row"><label for="sGX">Group X</label><input type="range" id="sGX" min="-4" max="0" step="0.05" value="-2.5" /><b id="sGXVal">-2.50</b></div>
+        <div class="slider-row"><label for="sGY">Group rot Y</label><input type="range" id="sGY" min="0" max="3.14" step="0.01" value="0.52" /><b id="sGYVal">0.52</b></div>
+        <div class="slider-row"><label for="sCX">Child X</label><input type="range" id="sCX" min="0" max="2" step="0.01" value="1" /><b id="sCXVal">1.00</b></div>
+      </div>
+      <div class="dock">
+        <div class="slider-row"><label for="sRough">Roughness</label><input type="range" id="sRough" min="0" max="1" step="0.01" value="0.25" /><b id="sRoughVal">0.25</b></div>
+        <div class="slider-row"><label for="sMetal">Metalness</label><input type="range" id="sMetal" min="0" max="1" step="0.01" value="0.1" /><b id="sMetalVal">0.10</b></div>
+        <div class="slider-row"><label for="sDir">Directional</label><input type="range" id="sDir" min="0" max="4" step="0.05" value="2.5" /><b id="sDirVal">2.50</b></div>
+      </div>
+      </div>
+      </div>
+
+      <div class="canvas-frame canvas-wide">
+        <div class="gl-wrap">
+          <canvas id="glMain" width="800" height="500" tabindex="0" aria-label="Main Interactive 3D Prototype"></canvas>
+          <div class="gl-hud" id="hudMain">loading</div>
+        </div>
+      </div>
+
+      <div class="telemetry">
+        <div class="tele"><span>Hover</span><b id="hoverInfo">-</b></div>
+        <div class="tele"><span>Selected</span><b id="selectedInfo">-</b></div>
+        <div class="tele"><span>Animation</span><b id="animationInfo">-</b></div>
+        <div class="tele"><span>Loading</span><b id="loadingInfo">ready</b></div>
+      </div>
+
+      <p class="canvas-hint">Focus the canvas then press P to swap the camera and E to flip the environment and Space to pause. Click selects and sets the Persistent scale. Dragging past 5 pixels keeps selection untouched. The Log button prints the child local position against its world position into the Console.</p>
+
+      <div class="stage-panels">
+        <div class="side-block">
+          <h3 class="side-title">Live data</h3>
+          <div class="data-lines" id="dataMain"></div>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">How it works</h3>
+          <ul class="ticks">
+            <li>Local position lives on the child while world position composes every parent matrix above it.</li>
+            <li>One raycaster feeds both hover and click yet each keeps its own state variable.</li>
+            <li>Hover scale 1.06 is temporary and selected scale 1.12 persists until the next click.</li>
+            <li>scene.background stays a flat navy while scene.environment lights the PBR materials.</li>
+          </ul>
+        </div>
+        <div class="side-block">
+          <h3 class="side-title">Try this</h3>
+          <ul class="ticks">
+            <li>Turn Group rot Y and watch the child world row move while the child local row stays put.</li>
+            <li>Push Metalness to 1 then flip Env off to see a metal surface go dark.</li>
+            <li>Flip Recursive off and try to select the robot. Its child meshes fall out of reach.</li>
+            <li>Click the robot and switch Clip while it walks. The mixer crossfades without a reload.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHALLENGE LABS ============ -->
+    <section class="labs" id="labs">
+      <div class="lab-grid">
+
+        <article class="lab-card" id="lab-a">
+          <div class="challenge-header">
+            <span class="ch-num">A</span>
+            <h2>Clip switchboard</h2>
+          </div>
+          <p class="explain">
+            One AnimationMixer drives many AnimationActions. Idle plus Walking
+            plus Running swap with a short crossfade so the old action fades out
+            while the new one fades in.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Clip buttons">
+              <button class="tool-btn" id="btnA1">1. Idle</button>
+              <button class="tool-btn" id="btnA2">2. Walking</button>
+              <button class="tool-btn" id="btnA3">3. Running</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glA" width="520" height="320" tabindex="0" aria-label="Animation clip lab"></canvas>
+              <div class="gl-hud" id="hudA">loading</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Focus then press 1 or 2 or 3. Keys and buttons drive the same crossfade.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataA"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>clipAction builds one action per clip and the mixer blends them.</li>
+              <li>fadeOut plus fadeIn overlap so the pose never snaps.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-b">
+          <div class="challenge-header">
+            <span class="ch-num">B</span>
+            <h2>Click plays animation</h2>
+          </div>
+          <p class="explain">
+            Click the robot and it waves. The click selects through a raycast,
+            then a one shot gesture clip plays and hands control back to the idle
+            loop when it finishes.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Gesture trigger">
+              <button class="tool-btn" id="btnBWave">Wave</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glB" width="520" height="320" tabindex="0" aria-label="Click gesture lab"></canvas>
+              <div class="gl-hud" id="hudB">loading</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Click the robot or press the button. Either path fires the same gesture.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataB"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>LoopOnce plus clampWhenFinished holds the last pose until idle returns.</li>
+              <li>The finished event is the hand back cue, not a timer.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-c">
+          <div class="challenge-header">
+            <span class="ch-num">C</span>
+            <h2>Information panel</h2>
+          </div>
+          <p class="explain">
+            Click the cube or the sphere or the robot and read its live data.
+            Name plus position plus rotation plus scale plus material type all
+            come back through the same selectable root lookup the stage uses.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glC" width="520" height="320" tabindex="0" aria-label="Information panel lab"></canvas>
+              <div class="gl-hud" id="hudC">pick one</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Click any object. Clicking empty space clears the panel.</p>
+          <div class="side-block">
+            <h3 class="side-title">Selected object</h3>
+            <div class="data-lines" id="dataC"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Child meshes inside the GLB map back to the labeled root before reporting.</li>
+              <li>Material type reads from the first mesh under the selected root.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-d">
+          <div class="challenge-header">
+            <span class="ch-num">D</span>
+            <h2>Hierarchical solar system</h2>
+          </div>
+          <p class="explain">
+            Sun holds an orbit group that holds Earth that holds a moon orbit
+            group that holds the Moon. No world position is written by hand.
+            Every seat falls out of the hierarchy and one world readout per
+            frame proves it.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glD" width="520" height="320" tabindex="0" aria-label="Solar system lab"></canvas>
+              <div class="gl-hud" id="hudD">orbit</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Earth turns its orbit while the Moon turns a faster one inside it. One angle feeds each level.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataD"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Each orbit is a Group whose rotation carries every descendant.</li>
+              <li>getWorldPosition composes the chain while local values stay fixed.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-e">
+          <div class="challenge-header">
+            <span class="ch-num">E</span>
+            <h2>PBR material gallery</h2>
+          </div>
+          <p class="explain">
+            Nine spheres in one grid. Rows hold roughness 0.1 plus 0.5 plus 0.9
+            against metalness 0 plus 0.5 plus 1 on the columns. The group turns
+            slowly so reflections sweep across every surface.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glE" width="520" height="320" tabindex="0" aria-label="PBR gallery lab"></canvas>
+              <div class="gl-hud" id="hudE">rows R 0.9 0.5 0.1</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Top row is roughest down to 0.1 at the bottom. Left column is metalness 0 moving right to 1.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataE"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Roughness blurs the reflection while metalness tints it with the base color.</li>
+              <li>Metal needs environment light. Without it the row of 1.0 goes dark.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-f">
+          <div class="challenge-header">
+            <span class="ch-num">F</span>
+            <h2>Hover emissive</h2>
+          </div>
+          <p class="explain">
+            Hover a sphere and its material lights up through the emissive
+            channel. Each sphere owns its own material so no shared asset is
+            touched destructively.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glF" width="520" height="320" tabindex="0" aria-label="Hover emissive lab"></canvas>
+              <div class="gl-hud" id="hudF">hover</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Move the pointer across the three spheres. The last touched material returns to its base color when the pointer leaves.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataF"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Base color is stored in userData before the first hover.</li>
+              <li>One material per sphere keeps the feedback local.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-g">
+          <div class="challenge-header">
+            <span class="ch-num">G</span>
+            <h2>Selection rotation</h2>
+          </div>
+          <p class="explain">
+            Click any shape and it starts a slow spin timed by delta. Click
+            another and the old spin stops where it stood while the new one
+            takes over.
+          </p>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glG" width="520" height="320" tabindex="0" aria-label="Selection rotation lab"></canvas>
+              <div class="gl-hud" id="hudG">pick one</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Click the cube or the sphere or the ring. Click empty space to stop every spin.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataG"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>Selection holds one reference and the loop spins only that object.</li>
+              <li>Delta keeps the spin speed honest across displays.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="lab-card" id="lab-h">
+          <div class="challenge-header">
+            <span class="ch-num">H</span>
+            <h2>Environment toggle</h2>
+          </div>
+          <p class="explain">
+            A polished metal sphere next to a matte one. Flip the environment
+            and compare. The metal surface loses its reflection while the matte
+            surface barely moves.
+          </p>
+          <div class="dock">
+            <div class="tool-group" aria-label="Environment toggle">
+              <button class="tool-btn" id="btnHEnv">Env. On</button>
+            </div>
+          </div>
+          <div class="canvas-frame">
+            <div class="gl-wrap">
+              <canvas id="glH" width="520" height="320" tabindex="0" aria-label="Environment toggle lab"></canvas>
+              <div class="gl-hud" id="hudH">Environment ON</div>
+            </div>
+          </div>
+          <p class="canvas-hint">Focus then press E. The button mirrors the same flag.</p>
+          <div class="side-block">
+            <h3 class="side-title">Live data</h3>
+            <div class="data-lines" id="dataH"></div>
+          </div>
+          <div class="side-block">
+            <h3 class="side-title">How it works</h3>
+            <ul class="ticks">
+              <li>scene.environment reads as a light source for every PBR material.</li>
+              <li>scene.background stays flat so only the materials change.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-copy">Practicum 7 by Arda Nareswara - Computer Graphics - Practicum projects</p>
+    </div>
+  </footer>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
