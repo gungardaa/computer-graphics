@@ -347,7 +347,7 @@ const stage = (() => {
     camera.fov = 55;
     camera.zoom = 1;
     camera.updateProjectionMatrix();
-    camera.position.set(5, 3.5, 7);
+    camera.position.set(5, 3.5, 10);
     controls.target.set(0, 1.2, 0);
     controls.object = camera;
     controls.update();

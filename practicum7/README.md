@@ -1,8 +1,9 @@
 # Practicum 7 - Three.js Interactive 3D Application
 
-**Author** Anak Agung Putu Arda Nareswara <br>
-**NRP** 5025241074 <br>
-**Class** B
+**Author**: Anak Agung Putu Arda Nareswara <br>
+**NRP**: 5025241074 <br>
+**Class**: B <br>
+**Group**: 10
 
 Web https://ardanareswara-computer-graphics.vercel.app
 
