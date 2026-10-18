@@ -13,6 +13,7 @@ run("npx vite build midterm --base=./", root);
 const deploy = join(root, "deploy");
 rmSync(deploy, { recursive: true, force: true });
 mkdirSync(deploy, { recursive: true });
+cpSync(join(root, "public", "favicon.png"), join(deploy, "favicon.png"));
 
 for (const f of ["index.html", "styles.css", "app.js"]) {
   cpSync(join(root, f), join(deploy, f));
@@ -25,6 +26,7 @@ for (const d of ["practicum1", "practicum2", "practicum3", "practicum4", "practi
 }
 cpSync(join(root, "practicum6", "dist"), join(deploy, "practicum6"), { recursive: true });
 cpSync(join(root, "practicum7", "dist"), join(deploy, "practicum7"), { recursive: true });
+cpSync(join(root, "public", "favicon.png"), join(deploy, "practicum6", "favicon.png"));
 cpSync(join(root, "public", "favicon.png"), join(deploy, "practicum7", "favicon.png"));
 cpSync(join(root, "midterm", "dist"), join(deploy, "midterm"), { recursive: true });
 
