@@ -1,6 +1,6 @@
 # Computer Graphics Practicum
 
-A collection of Computer Graphics practicum projects, covering Practicum 1 through Practicum 7.
+A collection of Computer Graphics practicum projects, covering Practicum 1 through Practicum 7 plus the UTS Meteor Defense midterm project.
 
 ## Project Structure
 
@@ -13,6 +13,7 @@ Grafika Komputer/
 ├── practicum5/
 ├── practicum6/
 ├── practicum7/
+├── midterm/
 ├── scripts/
 ├── index.html
 ├── styles.css
@@ -22,7 +23,7 @@ Grafika Komputer/
 └── vite.config.js
 ```
 
-Each practicum contains its own HTML, JavaScript, and CSS files. Practicum 6 and Practicum 7 use Three.js and are integrated into the root Vite project.
+Each practicum contains its own HTML, JavaScript, and CSS files. Practicum 6, Practicum 7, and the UTS midterm project use Three.js and are integrated into the root Vite project.
 
 ## Getting Started
 

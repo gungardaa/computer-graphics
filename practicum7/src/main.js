@@ -13,7 +13,7 @@ const CALM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const f2 = (n) => (n < 0 ? "-" : "") + Math.abs(n).toFixed(2).replace("-", "");
 const vec3 = (v) => `${f2(v.x)} ${f2(v.y)} ${f2(v.z)}`;
 
-/* ponytail: dev serves the repo root while build copies public to the dist root. */
+/* dev serves the repo root while build copies public to the dist root. */
 const MODEL_URL = import.meta.env.DEV
   ? "/practicum7/public/models/model.glb"
   : import.meta.env.BASE_URL + "models/model.glb";
@@ -155,7 +155,7 @@ const stage = (() => {
   stdGround(scene);
 
   const camera = new THREE.PerspectiveCamera(55, canvas.width / canvas.height, 0.1, 100);
-  camera.position.set(5, 3.5, 7);
+  camera.position.set(5, 3.5, 10);
   camera.lookAt(0, 1.2, 0);
   const orthoSize = 3.4;
   const ortho = new THREE.OrthographicCamera(-orthoSize, orthoSize, orthoSize, -orthoSize, 0.1, 100);
@@ -518,7 +518,7 @@ function miniLab(id, camPos, lookAt, build) {
 }
 
 /* A. clip switchboard */
-miniLab("glA", [0, 2.4, 5], [0, 1.1, 0], (scene, camera, renderer, canvas) => {
+miniLab("glA", [0, 2.4, 10], [0, 1.1, 0], (scene, camera, renderer, canvas) => {
   addEnv(scene, renderer);
   stdLights(scene);
   stdGround(scene);
@@ -570,7 +570,7 @@ miniLab("glA", [0, 2.4, 5], [0, 1.1, 0], (scene, camera, renderer, canvas) => {
 });
 
 /* B. click plays animation */
-miniLab("glB", [0, 2.4, 5], [0, 1.1, 0], (scene, camera, renderer, canvas) => {
+miniLab("glB", [0, 2.4, 10], [0, 1.1, 0], (scene, camera, renderer, canvas) => {
   addEnv(scene, renderer);
   stdLights(scene);
   stdGround(scene);
@@ -638,7 +638,7 @@ miniLab("glB", [0, 2.4, 5], [0, 1.1, 0], (scene, camera, renderer, canvas) => {
 });
 
 /* C. information panel */
-miniLab("glC", [3.6, 2.8, 6.6], [0, 1, 0], (scene, camera, renderer, canvas) => {
+miniLab("glC", [3.6, 2.8, 10], [0, 1, 0], (scene, camera, renderer, canvas) => {
   addEnv(scene, renderer);
   stdLights(scene);
   stdGround(scene);

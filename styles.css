@@ -326,6 +326,11 @@ section[id] {
   margin-bottom: var(--sp-md);
 }
 
+.badge-accent {
+  color: var(--hairline);
+  border-color: rgba(77, 243, 255, 0.45);
+}
+
 /* Footer */
 .site-footer {
   border-top: 1px solid var(--card-border);
