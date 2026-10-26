@@ -122,7 +122,7 @@ button {
   100% { opacity: 0; }
 }
 
-body.low-integrity .edge-vignette {
+body.low-health .edge-vignette {
   background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(255, 60, 40, 0.35) 100%);
   animation: danger-breathe 1.7s ease-in-out infinite;
 }
@@ -246,6 +246,9 @@ body.low-integrity .edge-vignette {
 .hud-stats {
   display: flex;
   align-items: flex-start;
+  justify-content: center;
+  order: -1;
+  width: 100%;
   gap: 26px;
   padding: 12px 20px;
   border: 1px solid var(--card-border);
@@ -261,7 +264,7 @@ body.low-integrity .edge-vignette {
   min-width: 54px;
 }
 
-.stat-integrity {
+.stat-health {
   min-width: 150px;
 }
 
@@ -292,7 +295,7 @@ body.low-integrity .edge-vignette {
   overflow: hidden;
 }
 
-.stat-integrity .bar {
+.stat-health .bar {
   width: 130px;
   margin: 3px 0 2px;
 }
@@ -344,6 +347,7 @@ body.low-integrity .edge-vignette {
 
 .hud-bottom {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
   gap: 18px;
@@ -534,6 +538,7 @@ body.low-integrity .edge-vignette {
 }
 
 .hud-hint {
+  width: 100%;
   margin-top: 10px;
   text-align: center;
   font-size: 11px;
@@ -607,7 +612,7 @@ body.low-integrity .edge-vignette {
 .fps {
   position: fixed;
   right: 26px;
-  bottom: 96px;
+  top: 60px;
   z-index: 4;
   font-family: var(--font-display);
   font-size: 11px;
@@ -917,11 +922,11 @@ kbd {
     padding: 10px 14px;
   }
 
-  .stat-integrity {
+.stat-health {
     min-width: 110px;
   }
 
-  .stat-integrity .bar {
+.stat-health .bar {
     width: 96px;
   }
 
@@ -948,7 +953,7 @@ kbd {
 
   .fps {
     right: 14px;
-    bottom: 118px;
+    top: 52px;
   }
 }
 
@@ -993,7 +998,7 @@ kbd {
     transition-duration: 0.001ms !important;
   }
 
-  body.low-integrity .edge-vignette,
+  body.low-health .edge-vignette,
   .bar-fill.danger,
   .overheat-tag.visible {
     animation: none;

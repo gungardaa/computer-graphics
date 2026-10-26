@@ -162,7 +162,7 @@ async function boot() {
   if (params.get("end")) {
     game.startRun();
     ui.showEnd(params.get("end") !== "lose", {
-      score: 6350, wave: 4, shots: 52, hits: 41, integrity: 46,
+      score: 6350, wave: 5, shots: 52, hits: 41, health: 46,
     });
   }
   const clock = new THREE.Clock();

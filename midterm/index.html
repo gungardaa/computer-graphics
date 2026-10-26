@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UTS - Meteor Defense - Computer Graphics</title>
-  <meta name="description" content="Meteor Defense. Interactive 3D mini game built with Three.js for the Computer Graphics midterm exam. Defend an orbital station from four waves of meteors with hitscan weapons, shielding and focus abilities." />
+  <meta name="description" content="Meteor Defense. Interactive 3D mini game built with Three.js for the Computer Graphics midterm exam. Defend an orbital station from five waves of meteors with hitscan weapons, shielding and focus abilities." />
+  <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -27,26 +28,6 @@
         <span class="brand-sub">EF234504 Computer Graphics &middot; UTS</span>
       </div>
 
-      <div class="hud-stats">
-        <div class="stat stat-integrity">
-          <span class="stat-label">Integrity</span>
-          <div class="bar"><div class="bar-fill" id="integrity-bar"></div></div>
-          <span class="stat-value" id="integrity-value">100%</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Score</span>
-          <span class="stat-value stat-strong" id="score-value">0</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Wave</span>
-          <span class="stat-value" id="wave-value">1/4</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Inbound</span>
-          <span class="stat-value" id="remaining-value">0</span>
-        </div>
-      </div>
-
       <div class="hud-actions">
         <button class="hud-btn" id="pause-btn" type="button" aria-label="Pause the game">Pause</button>
         <button class="hud-btn" id="mute-btn" type="button" aria-pressed="false" aria-label="Toggle sound">Sound On</button>
@@ -54,6 +35,26 @@
     </header>
 
     <footer class="hud-bottom">
+      <div class="hud-stats">
+        <div class="stat stat-health">
+          <span class="stat-label">Health Points</span>
+          <div class="bar"><div class="bar-fill" id="health-bar"></div></div>
+          <span class="stat-value" id="health-value">100%</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Score</span>
+          <span class="stat-value stat-strong" id="score-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Wave</span>
+          <span class="stat-value" id="wave-value">1/5</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Inbound</span>
+          <span class="stat-value" id="remaining-value">0</span>
+        </div>
+      </div>
+
       <div class="weapon-chips" role="group" aria-label="Weapon selection">
         <button class="chip" type="button" data-weapon="pulse" aria-label="Pulse weapon, key 1">
           <span class="chip-key">1</span>
@@ -82,11 +83,11 @@
           <span class="ability-state">Ready</span>
         </button>
       </div>
-    </footer>
 
-    <p class="hud-hint">
-      Crosshair aims &middot; Left click to fire &middot; 1 2 swap weapon &middot; Space or right click shield &middot; F focus &middot; Esc pause
-    </p>
+      <p class="hud-hint">
+        Crosshair aims &middot; Left click to fire &middot; 1 2 swap weapon &middot; Space or right click shield &middot; F focus &middot; Esc pause
+      </p>
+    </footer>
   </div>
 
   <!-- ============ Banners and popups ============ -->
@@ -100,10 +101,10 @@
   <!-- ============ Overlays ============ -->
   <div class="overlay visible" id="menu">
     <div class="panel menu-panel">
-      <span class="eyebrow">Topik 10 &middot; UTS</span>
+      <span class="eyebrow">Topik 8 &middot; UTS</span>
       <h1>Meteor<br />Defense</h1>
       <p class="lead">
-        An orbital station sits in a calm debris belt. Four waves of meteors
+        An orbital station sits in a calm debris belt. Five waves of meteors
         are on approach. Hold the line with hitscan weapons, a recharging
         shield and a focus field that bends time around you.
       </p>
@@ -136,11 +137,11 @@
 
   <div class="overlay" id="pause-overlay">
     <div class="panel pause-panel">
-      <span class="eyebrow">Systems hold</span>
+      <span class="eyebrow">Mission on standby</span>
       <h2>Paused</h2>
-      <p class="lead">The debris field waits. Yours to resume.</p>
+      <p class="lead">The debris field waits. Resume when you're ready.</p>
       <button class="btn btn-primary" id="resume-btn" type="button">Resume</button>
-      <button class="btn btn-ghost" id="quit-btn" type="button">Restart Run</button>
+      <button class="btn btn-ghost" id="quit-btn" type="button">Restart</button>
     </div>
   </div>
 

@@ -5,8 +5,8 @@ export function createUI({ camera, canvas }) {
   const el = (id) => document.getElementById(id);
   const dom = {
     hud: el("hud"),
-    integrityBar: el("integrity-bar"),
-    integrityValue: el("integrity-value"),
+    healthBar: el("health-bar"),
+    healthValue: el("health-value"),
     scoreValue: el("score-value"),
     waveValue: el("wave-value"),
     remainingValue: el("remaining-value"),
@@ -76,13 +76,13 @@ export function createUI({ camera, canvas }) {
     dom.hud.classList.toggle("visible", show);
   }
 
-  function setIntegrity(ratio) {
+  function setHealth(ratio) {
     const pct = Math.max(0, Math.round(ratio * 100));
-    if (!changed("integrity", pct)) return;
-    dom.integrityBar.style.width = `${pct}%`;
-    dom.integrityValue.textContent = `${pct}%`;
-    dom.integrityBar.classList.toggle("warn", pct <= 60 && pct > 30);
-    dom.integrityBar.classList.toggle("danger", pct <= 30);
+    if (!changed("health", pct)) return;
+    dom.healthBar.style.width = `${pct}%`;
+    dom.healthValue.textContent = `${pct}%`;
+    dom.healthBar.classList.toggle("warn", pct <= 60 && pct > 30);
+    dom.healthBar.classList.toggle("danger", pct <= 30);
   }
 
   function setScore(score) {
@@ -139,9 +139,9 @@ export function createUI({ camera, canvas }) {
     dom.damage.classList.add("flash");
   }
 
-  function setLowIntegrity(low) {
+  function setLowHealth(low) {
     if (!changed("low", low)) return;
-    document.body.classList.toggle("low-integrity", low);
+    document.body.classList.toggle("low-health", low);
   }
 
   let fpsAccum = 0;
@@ -168,13 +168,13 @@ export function createUI({ camera, canvas }) {
     dom.endTitle.textContent = won ? "STATION SECURED" : "STATION LOST";
     dom.endSub.textContent = won
       ? "All hostile orbits cleared. The station holds."
-      : "Hull integrity depleted. The debris field claims another station.";
+      : "Hull health points depleted. The debris field claims another station.";
     const accuracy = stats.shots > 0 ? Math.round((stats.hits / stats.shots) * 100) : 0;
     dom.endStats.innerHTML = `
       <div class="end-stat"><span>Score</span><strong>${stats.score}</strong></div>
       <div class="end-stat"><span>Waves survived</span><strong>${stats.wave}</strong></div>
       <div class="end-stat"><span>Accuracy</span><strong>${accuracy}%</strong></div>
-      <div class="end-stat"><span>Integrity left</span><strong>${stats.integrity}%</strong></div>`;
+      <div class="end-stat"><span>Health Points left</span><strong>${stats.health}%</strong></div>`;
     dom.end.classList.add("visible");
     announce(won ? "Victory. Station secured." : "Defeat. Station lost.");
   }
@@ -192,7 +192,7 @@ export function createUI({ camera, canvas }) {
     banner,
     announce,
     showHud,
-    setIntegrity,
+    setHealth,
     setScore,
     setWave,
     setRemaining,
@@ -200,7 +200,7 @@ export function createUI({ camera, canvas }) {
     setWeapons,
     setAbility,
     damageFlash,
-    setLowIntegrity,
+    setLowHealth,
     tickFps,
     showMenu,
     hideMenu,

@@ -1,14 +1,14 @@
 # UTS - Meteor Defense - Interactive 3D Mini Game
 
-**Author** Anak Agung Putu Arda Nareswara
-**NRP** 5025241074
+**Author** Anak Agung Putu Arda Nareswara <br>
+**NRP** 5025241074 <br>
 **Class** B
 
 Web https://ardanareswara-computer-graphics.vercel.app
 
 This is my midterm exam project for Computer Graphics, the interactive web 3D
 project for Topik 10 Meteor Defense. An orbital station hovers above a
-planet while four waves of meteors dive at it. The player aims a turret with
+planet while five waves of meteors dive at it. The player aims a turret with
 the pointer, fires one of two hitscan weapons, watches the heat gauge, raises
 a recharging shield, and bends time with a focus field until the boss
 asteroid breaks apart or the hull gives way. The whole game runs in one
@@ -20,7 +20,9 @@ in one working piece.
 
 ![Gameplay](screenshot-2.png)
 
-![End screen](screenshot-3.png)
+![Losing screen](screenshot-3.png)
+
+![Winning screen](screenshot-4.png)
 
 ## Running the project
 
@@ -50,22 +52,25 @@ npm run preview
 
 ## Gameplay
 
-The station holds 100 integrity points. Every meteor that reaches it takes
-its damage out of the hull, and the run ends when the hull hits zero. Four
+The station holds 100 health points. Every meteor that reaches it takes
+its damage out of the hull, and the run ends when the hull hits zero. Five
 waves arrive in sequence and the last one brings a boss asteroid with six
-escorts. Clearing a wave restores the hull, a flawless wave pays a bonus,
-and every destroyed meteor scores points by type. The turret overheats if
-the trigger is held too long, so the two weapons trade fire rate against
-heat and damage. The shield absorbs ordinary meteors on contact while the
-boss punches through it, and the focus field slows the whole simulation
-to a third for four seconds which makes the boss split dodgeable.
+escorts. Wave one is deliberately slow, a warm up of loose rocks and a pair
+of ice shards. Clearing a wave restores the hull, a flawless wave pays a
+bonus, and every destroyed meteor scores points by type. The turret
+overheats if the trigger is held too long, so the two weapons trade fire
+rate against heat and damage. The shield absorbs ordinary meteors on
+contact while the boss punches through it, and the focus field slows the
+whole simulation to a third for four seconds which makes the boss split
+dodgeable.
 
 | Wave | Content | Meteor types |
 |---|---|---|
-| 1 | 8 meteors on a loose interval | rock plus ice |
-| 2 | 12 meteors, faster | rock plus ice plus hulk |
-| 3 | 14 meteors, quick interval | rock plus ice plus hulk |
-| 4 | boss asteroid plus 6 escorts | everything plus the boss |
+| 1 | 8 meteors on a slow, loose interval | rock plus ice |
+| 2 | 10 meteors, faster | rock plus ice plus hulk |
+| 3 | 12 meteors, denser | rock plus ice plus hulk |
+| 4 | 14 meteors, quick interval | rock plus ice plus hulk |
+| 5 | boss asteroid plus 6 escorts | everything plus the boss |
 
 ## Meteor types
 
@@ -145,7 +150,7 @@ atmosphere is a fresnel backside shader.
   contacts and explosions
 - Beam shots animate as stretched additive cylinders from the muzzle
 - Camera shake is amount based and decays exponentially, with random roll
-- Damage flashes a vignette, low integrity pulses it red
+- Damage flashes a vignette, low health point pulses it red
 - All audio is synthesized with WebAudio oscillators and filtered noise,
   so there is not a single sound file in the project. The context unlocks
   on the first click and the mute button persists per session
@@ -174,7 +179,7 @@ atmosphere is a fresnel backside shader.
 - At least two visual effects, particles plus sprites plus beams are
   three, met
 - Health and score HUD with wave and inbound counters, met
-- At least three waves, four are present, met
+- At least three waves, five are present, met
 - At least two meteor types, four are present, met
 - Win and lose states with restart, met
 - Optional challenges, multiple weapons, slow motion focus, camera
@@ -183,13 +188,7 @@ atmosphere is a fresnel backside shader.
 
 ## Assets and credits
 
-Meteor rocks, habitat dome, geodesic dome, solar panel, comm dish and pod
-modules are from the Ultimate Space Kit by Quaternius, CC0, downloaded
-through Poly Pizza as GLB files. The planet, clouds, atmosphere, starfield,
-nebula, turret, shield and every effect are generated in code. Audio is
-synthesized at runtime with the WebAudio API. The interface follows the
-shared Grafika Komputer design system, Space Grotesk plus DM Sans on deep
-navy with cyan hairlines.
+Meteor rocks, habitat dome, geodesic dome, solar panel, comm dish and pod modules are from the Ultimate Space Kit by Quaternius (https://quaternius.com/), CC0, downloaded through Poly Pizza (https://poly.pizza/bundle/Ultimate-Space-Kit-YWh743lqGX) as GLB files. The planet, clouds, atmosphere, starfield, nebula, turret, shield and every effect are generated in code. Audio is synthesized at runtime with the Web Audio API (https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API). The interface uses Space Grotesk (https://fonts.google.com/specimen/Space+Grotesk) plus DM Sans (https://fonts.google.com/specimen/DM+Sans) on deep navy with cyan hairlines.
 
 ## Debugging notes
 

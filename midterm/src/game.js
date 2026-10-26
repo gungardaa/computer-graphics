@@ -4,7 +4,7 @@ export function createGame({ meteors, defense, sceneApi, ui, audio }) {
   const state = {
     phase: "menu",
     wave: -1,
-    integrity: STATION.maxIntegrity,
+    health: STATION.maxHealth,
     score: 0,
     shots: 0,
     hits: 0,
@@ -19,18 +19,18 @@ export function createGame({ meteors, defense, sceneApi, ui, audio }) {
     meteors.clear();
     defense.reset();
     sceneApi.reset();
-    state.integrity = STATION.maxIntegrity;
+    state.health = STATION.maxHealth;
     state.score = 0;
     state.shots = 0;
     state.hits = 0;
     state.perfect = true;
     state.wave = -1;
     state.timeScale = 1;
-    ui.setIntegrity(1);
+    ui.setHealth(1);
     ui.setScore(0);
     ui.setWave(1, waveCount());
     ui.setRemaining(0);
-    ui.setLowIntegrity(false);
+    ui.setLowHealth(false);
   }
 
   function startRun() {
@@ -58,14 +58,14 @@ export function createGame({ meteors, defense, sceneApi, ui, audio }) {
   function endRun(won) {
     state.phase = won ? "won" : "lost";
     audio.play(won ? "win" : "lose");
-    ui.setLowIntegrity(false);
+    ui.setLowHealth(false);
     ui.showHud(false);
     ui.showEnd(won, {
       score: state.score,
       wave: Math.min(state.wave + 1, waveCount()),
       shots: state.shots,
       hits: state.hits,
-      integrity: Math.max(0, Math.round(state.integrity)),
+      health: Math.max(0, Math.round(state.health)),
     });
   }
 
@@ -86,14 +86,14 @@ export function createGame({ meteors, defense, sceneApi, ui, audio }) {
 
   function onImpact(record) {
     if (state.phase !== "playing") return;
-    state.integrity -= METEOR_TYPES[record.type].damage;
+    state.health -= METEOR_TYPES[record.type].damage;
     state.perfect = false;
-    ui.setIntegrity(Math.max(0, state.integrity) / STATION.maxIntegrity);
-    ui.setLowIntegrity(state.integrity <= STATION.maxIntegrity * 0.3);
+    ui.setHealth(Math.max(0, state.health) / STATION.maxHealth);
+    ui.setLowHealth(state.health <= STATION.maxHealth * 0.3);
     ui.damageFlash();
     shake(record.type === "boss" ? 0.9 : 0.5);
     audio.play("alarm");
-    if (state.integrity <= 0) endRun(false);
+    if (state.health <= 0) endRun(false);
   }
 
   function onShieldHit() {
@@ -141,10 +141,10 @@ export function createGame({ meteors, defense, sceneApi, ui, audio }) {
       const bonus = waveBonus(state.wave + 1);
       state.score += bonus;
       const heal = state.perfect ? 30 : 18;
-      state.integrity = Math.min(STATION.maxIntegrity, state.integrity + heal);
+      state.health = Math.min(STATION.maxHealth, state.health + heal);
       ui.setScore(state.score);
-      ui.setIntegrity(state.integrity / STATION.maxIntegrity);
-      ui.setLowIntegrity(state.integrity <= STATION.maxIntegrity * 0.3);
+      ui.setHealth(state.health / STATION.maxHealth);
+      ui.setLowHealth(state.health <= STATION.maxHealth * 0.3);
       ui.banner(
         `WAVE ${state.wave + 1} CLEARED`,
         `${state.perfect ? "Flawless orbit +40 bonus, " : ""}hull restored`,
