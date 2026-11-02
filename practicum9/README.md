@@ -35,15 +35,15 @@ Each part was created as a separate object so it could be edited and assigned a 
 ## 4. Modeling Process
 ### Step 1 – Create the Lamp Base
 1. Start with a cylinder primitive.
-2. Enter Edit Mode.
+2. Enter Edit Mode (Tab).
 3. Use Loop Cut (Ctrl + R) to add supporting edge loops.
-4. Scale the upper and lower sections to form the base.
+4. Scale (S) the upper and lower sections to form the base.
 
 ![A cylinder primitive with horizontal loop cuts added in Edit Mode](screenshots/1_primitive_loop-cut.png)
 ![The cylinder shaped into an hourglass form by scaling the top and bottom faces](screenshots/2_scale-lampbase.png)
 
 ### Step 2 – Create the Lampshade
-1. Return to Object Mode.
+1. Return to Object Mode (Tab).
 2. Add a new cylinder for the lampshade.
 3. Enter Edit Mode and scale the upper and lower sections to shape the shade.
 4. Select the bottom face and delete it to make the shade open.
@@ -76,13 +76,11 @@ Each part was created as a separate object so it could be edited and assigned a 
 - Amount: 0.05 m
 - Segments: 10
 
-
 **Solidify Modifier – Lampshade**
 - Thickness: 0.05 m
 
 The Bevel Modifier softens the base edges. The Solidify Modifier gives the lampshade visible thickness.
 
-*Screenshots:*
 ![Bevel Modifier settings applied to the lamp base with an amount of 0.05m and 10 segments](screenshots/9_bevel-mod-lampbase.png)
 ![Solidify Modifier settings applied to the lampshade with a thickness of 0.05m](screenshots/10_solidify-lampshade.png)
 
