@@ -153,6 +153,7 @@ For the lampshade, a fabric-like appearance was selected to match the original b
 
 ![PBR material nodes for the lampshade](screenshots/13_pbr-lampshade.png)
 
+
 ### Lighting and Final Material Check
 
 The bulb uses an Emission material to create a warm glowing appearance. The following checks were performed:
@@ -165,6 +166,19 @@ The bulb uses an Emission material to create a warm glowing appearance. The foll
 6. Save the Blender project.
 
 ![Final table lamp with PBR materials and lighting](screenshots/14_final-pbr.png)
+
+### Environment Lighting
+
+An HDRI environment map from Poly Haven was used to provide environment lighting for the table lamp scene.
+
+| Information | Details |
+|:---|:---|
+| Environment | Lythwood Room |
+| Source | https://polyhaven.com/a/lythwood_room |
+| License | CC0 |
+| Purpose | Provides soft indoor illumination and environmental reflections |
+
+The HDRI was used to create a more natural indoor lighting environment and enhance the appearance of the lamp materials during rendering.
 
 ### Texture File Management
 
@@ -218,6 +232,18 @@ The downloaded Blender file was opened in Blender to inspect the Gothic Statue m
 
 The Base Color texture was set to sRGB, while Roughness and Normal textures were set to Non-Color. The Normal map was connected through a Normal Map node before reaching the Principled BSDF shader.
 
+### Environment Lighting
+
+An HDRI environment map from Poly Haven was used to provide environment lighting for the Gothic Statue scene.
+
+| Information | Details |
+|:---|:---|
+| Environment | Museum of Ethnography |
+| Source | https://polyhaven.com/a/museum_of_ethnography |
+| License | CC0 |
+| Purpose | Provides museum-style indoor illumination and environmental reflections |
+
+The HDRI was used to create a museum-like lighting environment and enhance the statue's material appearance during rendering.
 
 ### Before and After Comparison
 
